@@ -430,6 +430,13 @@ $options = array (
                     "type" => "select",
                     "options" => array("center", "right", "left"),
                     "std" => "center"),
+                  
+                  array( "name" => "Enable custom css?",
+                    "desc" => "Select if you want to enable custom css",
+                    "id" => $shortname."_css_enable",
+                    "type" => "select",
+                    "options" => array("No", "Yes"),
+                    "std" => "No"),    
 
                   array( "name" => "Custom CSS",
                     "desc" => "Want to add any custom CSS code? Put in here, and the rest is taken care of. This overrides any other stylesheets. eg: a.button{color:green}",
