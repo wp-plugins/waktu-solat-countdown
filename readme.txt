@@ -48,7 +48,7 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 
 == Screenshots == 
 1. Contoh paparan ruangan setting Waktu Solat Plugin Waktu-Solat-Setting-Page.png.
-1. Contoh paparan widget Waktu Solat Plugin Waktu-Solat-Widget-Sample.png.
+2. Contoh paparan widget Waktu Solat Plugin Waktu-Solat-Widget-Sample.png.
 
 
 == Changelog ==
