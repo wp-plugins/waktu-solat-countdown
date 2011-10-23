@@ -268,7 +268,10 @@ function waktuSolatMain($kod){
                 endif;      
 
             endfor;
-
+ // check if custom css enable or disabled;
+   if(get_option('ezws_css_enable') == "Yes"):
+          echo '<style>'. get_option('ezws_custom_css'). '</style>';
+   endif; 
 ?>
 
 <div id="wscontainer" <?php if(get_option('ezws_bg_scheme')!= ""): echo 'style="background-color:'.get_option('ezws_bg_scheme').'"'; endif; ?> >
@@ -729,7 +732,8 @@ add_action('admin_init', 'waktusolat_add_init');
 add_action('admin_menu', 'waktusolat_add_admin');
 
 function waktusolat_add_init() {
-      wp_enqueue_style("functions", plugins_url("/waktu-solat-countdown/style/admin.css"), false, "1.0", "all");
+      $plgDir = plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ); 
+      wp_enqueue_style("functions", $plgDir."/style/admin.css", false, "1.0", "all");
       wp_enqueue_style( 'farbtastic' );
       wp_enqueue_script( 'farbtastic' );
 
