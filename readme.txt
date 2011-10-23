@@ -4,7 +4,7 @@ Donate link: http://denaihati.com/projek-waktu-solat
 Tags: prayer time, widget, sidebar
 Requires at least: 3.0
 Tested up to: 3.2.1
-Stable tag: 1.3
+Stable tag: 1.3.1
 
 Showing prayer time with countdown
 
@@ -47,8 +47,8 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 - tiada nota kemaskini -
 
 == Screenshots == 
-1. Contoh paparan ruangan setting Waktu Solat Plugin Waktu-Solat-Setting-Page.png.
-2. Contoh paparan widget Waktu Solat Plugin Waktu-Solat-Widget-Sample.png.
+1. Contoh paparan ruangan setting Waktu Solat Plugin.
+2. Contoh paparan widget Waktu Solat Plugin.
 
 
 == Changelog ==

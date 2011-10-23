@@ -4,7 +4,7 @@
 Plugin Name: Waktu Solat Countdown
 Plugin URI: http://denaihati.com/projek-waktu-solat
 Description: Plugin waktu solat beserta jam randik menunjukkan berapa lama sebelum waktu sebelumnya tiba. Projek dengan kerjasama Denaihati Network.
-Version: 1.3
+Version: 1.3.1
 Author: Mohd Hadihaizil Din
 Author URI: http://www.eizil.com
 License: GPL2
