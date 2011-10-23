@@ -19,14 +19,14 @@ Plugin ini akan waktu solat di kawasan sekitar Malaysia, jam randik akan memapar
 
 To install this plugin, 
 
-1. Upload `ez-waktu-solat folder` to the `/wp-content/plugins/` directory
+1. Upload `waktu-solat-countdown folder` to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Go to Settings > Waktu Solat to edit the widget appearance.
 1. Go to Appearance > Widgets to add the widget to your sidebar.
 
 Untuk memasang plugin ini,
 
-1. Muat naik `folder ez-waktu-solat ` ke `/wp-content/plugins/` 
+1. Muat naik `folder waktu-solat-countdown ` ke `/wp-content/plugins/` 
 1. Aktifkan plugin menerusi menu 'Plugins' dalam WordPress
 1. Pergi ke Setting > Waktu Solat untuk menukar paparan widget.
 1. Pergi ke Appearance > Widgets untuk menambah widget ke sidebar anda.

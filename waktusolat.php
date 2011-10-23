@@ -729,7 +729,7 @@ add_action('admin_init', 'waktusolat_add_init');
 add_action('admin_menu', 'waktusolat_add_admin');
 
 function waktusolat_add_init() {
-      wp_enqueue_style("functions", plugins_url("/ez-waktu-solat/style/admin.css"), false, "1.0", "all");
+      wp_enqueue_style("functions", plugins_url("/waktu-solat-countdown/style/admin.css"), false, "1.0", "all");
       wp_enqueue_style( 'farbtastic' );
       wp_enqueue_script( 'farbtastic' );
 
