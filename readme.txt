@@ -4,7 +4,7 @@ Donate link: http://denaihati.com/projek-waktu-solat
 Tags: prayer time, widget, sidebar
 Requires at least: 3.0
 Tested up to: 3.2.1
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 
 Showing prayer time with countdown
 
@@ -42,6 +42,10 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 
 
 == Upgrade Notice == 
+
+= 1.3.2 =
+- kemaskini data untuk kod kawasan KDH06 -
+
 
 = 1.3 =
 - tiada nota kemaskini -
