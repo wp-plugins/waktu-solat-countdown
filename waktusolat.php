@@ -4,7 +4,7 @@
 Plugin Name: Waktu Solat Countdown
 Plugin URI: http://denaihati.com/projek-waktu-solat
 Description: Plugin waktu solat beserta jam randik menunjukkan berapa lama sebelum waktu sebelumnya tiba. Projek dengan kerjasama Denaihati Network.
-Version: 1.3.3
+Version: 1.3.4
 Author: Mohd Hadihaizil Din
 Author URI: http://www.eizil.com
 License: GPL2
@@ -272,12 +272,28 @@ function waktuSolatMain($kod){
    if(get_option('ezws_css_enable') == "Yes"):
           echo '<style>'. get_option('ezws_custom_css'). '</style>';
    endif; 
+
+   if($row[2] == "Ahad"):
+        $harijawi = "احد";
+   elseif($row[2] == "Isnin"):
+        $harijawi = "اثنين";
+   elseif($row[2] == "Selasa"):
+        $harijawi = "ثلاث";
+   elseif($row[2] == "Rabu"):
+        $harijawi = "رابو";
+   elseif($row[2] == "Khamis"):
+        $harijawi = "خميس";  
+   elseif($row[2] == "Jumaat"):
+        $harijawi = "جمعة";
+   elseif($row[2] == "Sabtu"):
+        $harijawi = "سبتو";
+   endif;  
 ?>
 
 <div id="wscontainer" <?php if(get_option('ezws_bg_scheme')!= ""): echo 'style="background-color:'.get_option('ezws_bg_scheme').'"'; endif; ?> >
                 <div class="info_message" id="ezws_main" <?php if(get_option('ezws_textalign')!= ""): echo 'style="text-align:'.get_option('ezws_textalign').'"'; endif; ?>>
-                    <?php echo $row[2]; ?><br />
-                    <?php echo $row[1]; ?> <br />
+                    <span style="font-size: 20px"><?php echo $harijawi; ?></span><br />
+                  <!--   <?php // echo $row[1]; ?> <br /> -->
                     <?php echo $hijri; ?> <br />
                     <?php echo ucfirst(strtolower($namaKawasan['Nama']));  ?> <br />
                     <span id="waktusolat">
@@ -313,6 +329,11 @@ function waktuSolatMain($kod){
                     <?php ezws_locator(); ?>
                     <a href="#ezws_main" id="showDiv">batal </a> 
                   </div>   
+                  <?php if(get_option('ezws_credit') == "Yes" || get_option('ezws_credit') == ""): ?>
+                  <div class="info_message" >
+                    <a href="http://denaihati.com/projek-waktu-solat" target="_blank" title="Projek Waktu Solat"><img src="<?php echo plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ) ."/images/dome-th.png"; ?>" width="60" height="22" alt="Projek Waktu Solat" /></a> 
+                  </div>    
+                  <?php endif;  ?>
                 </div>
                 <!-- Countdown dashboard end -->
                 <script language="javascript" type="text/javascript">
@@ -501,6 +522,12 @@ $options = array (
   font-weight: bold;
   text-align: center;
 }"),   
+                  array( "name" => "Show plugin credit?",
+                    "desc" => "Select if you want to enable plugin credit at the bottom of widget",
+                    "id" => $shortname."_credit",
+                    "type" => "select",
+                    "options" => array("Yes", "No"),
+                    "std" => "Yes"),
 
                   array( "type" => "close")
                   );
