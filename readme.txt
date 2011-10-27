@@ -4,7 +4,7 @@ Donate link: http://denaihati.com/projek-waktu-solat
 Tags: prayer time, widget, sidebar
 Requires at least: 3.0
 Tested up to: 3.2.1
-Stable tag: 1.3.4
+Stable tag: 1.3.5
 
 Showing prayer time with countdown
 
@@ -43,6 +43,11 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 
 == Upgrade Notice == 
 
+= 1.3.5 =
+- * CSS fixed. 
+* Panel settings bug fixed 
+* Compressed Javascript and html
+
 = 1.3.4 =
 - kemaskini untuk tambahan hari dalam tulisan jawi.
 
@@ -59,6 +64,11 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 
 
 == Changelog ==
+
+= 1.3.5 =
+* CSS fixed. 
+* Panel settings bug fixed 
+* Compressed Javascript and html 27/10/2011
 
 = 1.3.4 =
 * tambahan hari dalam tulisan jawi. 25/10/2011

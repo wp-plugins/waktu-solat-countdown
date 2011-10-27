@@ -4,7 +4,7 @@
 Plugin Name: Waktu Solat Countdown
 Plugin URI: http://denaihati.com/projek-waktu-solat
 Description: Plugin waktu solat beserta jam randik menunjukkan berapa lama sebelum waktu sebelumnya tiba. Projek dengan kerjasama Denaihati Network.
-Version: 1.3.4
+Version: 1.3.5
 Author: Mohd Hadihaizil Din
 Author URI: http://www.eizil.com
 License: GPL2
@@ -97,18 +97,23 @@ add_action('widgets_init', create_function('', 'return register_widget("WaktuSol
 
 // enqueue additional script untuk countdown
 function waktuSolatMethod() {
-   wp_enqueue_script('newscript1', plugins_url('/js/jquery-1.4.1.js', __FILE__), array('jquery'), '1.0', false);
-   wp_enqueue_script('newscript2', plugins_url('/js/jquery.lwtCountdown-1.0.js', __FILE__), array('jquery'), '1.0', false);
-   wp_enqueue_script('newscript3', plugins_url('/js/jquery.cookies.js', __FILE__), array('jquery'), '1.0', false);
+   wp_enqueue_script('newscript1', plugins_url('/js/jquery-1.4.1.js', __FILE__), array('jquery'), '1.1', false);
+   wp_enqueue_script('newscript2', plugins_url('/js/jquery.lwtCountdown-1.0.js', __FILE__), array('jquery'), '1.1', false);
+   wp_enqueue_script('newscript3', plugins_url('/js/jquery.cookies.js', __FILE__), array('jquery'), '1.1', false);
 
-   if(get_option('ezws_color_scheme') != ""):
-        $color = get_option('ezws_color_scheme');
-   else:
-        $color = "default";
-   endif;     
-   wp_register_style('waktusolat', plugins_url('/style/main_'.$color.'.css', __FILE__), false, 'All'); 
-   
-   wp_enqueue_style('waktusolat');
+
+       if(get_option('ezws_color_scheme') != ""):
+            $color = get_option('ezws_color_scheme');
+       else:
+            $color = "default";
+       endif;     
+
+       wp_register_style('waktusolat', plugins_url('/style/main_'.$color.'.css', __FILE__), false, 'All'); 
+       
+       wp_enqueue_style('waktusolat');
+       
+
+
 }    
 
 add_action('wp_enqueue_scripts', 'waktuSolatMethod');
@@ -271,7 +276,7 @@ function waktuSolatMain($kod){
  // check if custom css enable or disabled;
    if(get_option('ezws_css_enable') == "Yes"):
           echo '<style>'. get_option('ezws_custom_css'). '</style>';
-   endif; 
+   endif;  
 
    if($row[2] == "Ahad"):
         $harijawi = "احد";
@@ -287,13 +292,16 @@ function waktuSolatMain($kod){
         $harijawi = "جمعة";
    elseif($row[2] == "Sabtu"):
         $harijawi = "سبتو";
-   endif;  
+   endif;                  
+                  
+             
 ?>
+
 
 <div id="wscontainer" <?php if(get_option('ezws_bg_scheme')!= ""): echo 'style="background-color:'.get_option('ezws_bg_scheme').'"'; endif; ?> >
                 <div class="info_message" id="ezws_main" <?php if(get_option('ezws_textalign')!= ""): echo 'style="text-align:'.get_option('ezws_textalign').'"'; endif; ?>>
                     <span style="font-size: 20px"><?php echo $harijawi; ?></span><br />
-                  <!--   <?php // echo $row[1]; ?> <br /> -->
+                    <?php echo $row[1]; ?> <br />
                     <?php echo $hijri; ?> <br />
                     <?php echo ucfirst(strtolower($namaKawasan['Nama']));  ?> <br />
                     <span id="waktusolat">
@@ -328,10 +336,10 @@ function waktuSolatMain($kod){
                   <div class="info_message" id="ezwssetting" style="display: none; ">
                     <?php ezws_locator(); ?>
                     <a href="#ezws_main" id="showDiv">batal </a> 
-                  </div>   
-                  <?php if(get_option('ezws_credit') == "Yes" || get_option('ezws_credit') == ""): ?>
+                  </div>
+                  <?php if(get_option('ezws_credit') == "Yes"): ?>
                   <div class="info_message" >
-                    <a href="http://denaihati.com/projek-waktu-solat" target="_blank" title="Projek Waktu Solat"><img src="<?php echo plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ) ."/images/dome-th.png"; ?>" width="60" height="22" alt="Projek Waktu Solat" /></a> 
+                    <a href="http://denaihati.com/projek-waktu-solat" ><img src="<?php echo plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ) ."/images/dome-th.png"; ?>" width="60" height="22" alt="Projek Waktu Solat" /></a> 
                   </div>    
                   <?php endif;  ?>
                 </div>
@@ -423,7 +431,7 @@ function ezws_locator(){
 $shortname = "ezws";
 $pluginname = "Waktu Solat";
 
-$options = array (
+$ezwsoptions = array (
 
                   array( "name" => $pluginname." Options",
                     "type" => "title"),
@@ -451,13 +459,13 @@ $options = array (
                     "type" => "select",
                     "options" => array("center", "right", "left"),
                     "std" => "center"),
-                  
+
                   array( "name" => "Enable custom css?",
                     "desc" => "Select if you want to enable custom css",
                     "id" => $shortname."_css_enable",
                     "type" => "select",
                     "options" => array("No", "Yes"),
-                    "std" => "No"),    
+                    "std" => "No"),  
 
                   array( "name" => "Custom CSS",
                     "desc" => "Want to add any custom CSS code? Put in here, and the rest is taken care of. This overrides any other stylesheets. eg: a.button{color:green}",
@@ -526,7 +534,7 @@ $options = array (
                     "desc" => "Select if you want to enable plugin credit at the bottom of widget",
                     "id" => $shortname."_credit",
                     "type" => "select",
-                    "options" => array("Yes", "No"),
+                    "options" => array("No", "Yes"),
                     "std" => "Yes"),
 
                   array( "type" => "close")
@@ -537,7 +545,7 @@ function waktusolat_add_admin() {
 
         global $options;
 
-        if ( $_GET['page'] == basename(__FILE__) ) {
+        if ( $_GET['page'] == plugin_basename ( dirname ( __FILE__ )) ) {
 
           if ( 'save' == $_REQUEST['action'] ) {
 
@@ -546,7 +554,7 @@ function waktusolat_add_admin() {
 
             foreach ($options as $value) {if( isset( $_REQUEST[ $value['id'] ] ) ) { update_option( $value['id'], trim($_REQUEST[ $value['id'] ])  ); } else { delete_option( $value['id'] ); } }
 
-                      header("Location: options-general.php?page=waktusolat.php&saved=true");
+                      header("Location: options-general.php?page=".plugin_basename ( dirname ( __FILE__ ))."&saved=true");
                 die;
 
               }
@@ -555,86 +563,86 @@ function waktusolat_add_admin() {
               foreach ($options as $value) {
                 delete_option( $value['id'] ); }
 
-              header("Location: options-general.php?page=waktusolat.php&reset=true");
+              header("Location: options-general.php?page=".plugin_basename ( dirname ( __FILE__ ))."&reset=true");
               die;
 
               }
         }
 
-add_options_page("Waktu Solat", "Waktu Solat", 'administrator', basename(__FILE__), 'waktusolat_admin');
+add_options_page("Waktu Solat", "Waktu Solat", 'administrator', plugin_basename ( dirname ( __FILE__ )), 'waktusolat_admin');
 }
 
 function waktusolat_admin() {
 
-			global $options;
-			$i=0;
-			
-			if ( $_REQUEST['saved'] ) echo '
-			<div id="message" class="updated fade">
-				<p>
-					<strong>Waktu Solat settings saved.</strong>
-				</p>
-			</div>';
-			if ( $_REQUEST['reset'] ) echo '
-			<div id="message" class="updated fade">
-				<p>
-					<strong>Waktu Solat settings reset.</strong>
-				</p>
-			</div>';
-			
-			?>
-			<div class="wrap rm_wrap">
-				<h2>Waktu Solat Settings</h2>
-			
-				<div class="rm_opts">
-					<form method="post">
-			
-						<?php foreach ($options as $value) {
-			switch ( $value['type'] ) {
-			
-			case "open":
-						?>
-			
-						<?php break;
-			
-			case "close":
-						?>
-				</div>
-			</div>
-			<br />
-			
-			<?php break;
-			
-			case "title":
-			?>
-			<p>Please use the options page below to edit the widget settings.</p>
-			
-			<?php break;
-			
-			case 'text':
-			?>
-			
-			<div class="rm_input rm_text">
-				<label for="<?php echo $value['id']; ?>">
-					<?php echo $value['name'];
-					?>
-				</label>
-				<input name="<?php echo $value['id']; ?>" id="<?php echo $value['id']; ?>" type="<?php echo $value['type']; ?>" value="<?php if ( get_settings( $value['id'] ) != "") { echo stripslashes(get_settings( $value['id'])  ); } else { echo $value['std']; } ?>" />
-				<small>
-					<?php echo $value['desc'];
-					?>
-				</small>
-				<div class="clearfix">
-				</div>
-			
-			</div>
-			<?php
-			break;
+      global $ezwsoptions;
+      $i=0;
+      
+      if ( $_REQUEST['saved'] ) echo '
+      <div id="message" class="updated fade">
+        <p>
+          <strong>Waktu Solat settings saved.</strong>
+        </p>
+      </div>';
+      if ( $_REQUEST['reset'] ) echo '
+      <div id="message" class="updated fade">
+        <p>
+          <strong>Waktu Solat settings reset.</strong>
+        </p>
+      </div>';
+      
+      ?>
+      <div class="wrap ezws_wrap">
+        <h2>Waktu Solat Settings</h2>
+      
+        <div class="ezws_opts">
+          <form method="post">
+      
+            <?php foreach ($ezwsoptions as $value) {
+      switch ( $value['type'] ) {
+      
+      case "open":
+            ?>
+      
+            <?php break;
+      
+      case "close":
+            ?>
+        </div>
+      </div>
+      <br />
+      
+      <?php break;
+      
+      case "title":
+      ?>
+      <p>Please use the options page below to edit the widget settings.</p>
+      
+      <?php break;
+      
+      case 'text':
+      ?>
+      
+      <div class="ezws_input ezws_text">
+        <label for="<?php echo $value['id']; ?>">
+          <?php echo $value['name'];
+          ?>
+        </label>
+        <input name="<?php echo $value['id']; ?>" id="<?php echo $value['id']; ?>" type="<?php echo $value['type']; ?>" value="<?php if ( get_settings( $value['id'] ) != "") { echo stripslashes(get_settings( $value['id'])  ); } else { echo $value['std']; } ?>" />
+        <small>
+          <?php echo $value['desc'];
+          ?>
+        </small>
+        <div class="clearfix">
+        </div>
+      
+      </div>
+      <?php
+      break;
 // tambah case untuk color picker laks... :D senang sket nanti nak guna balik
       case 'colorpicker':
       ?>
       
-      <div class="rm_input rm_text">
+      <div class="ezws_input ezws_text">
         <label for="<?php echo $value['id']; ?>">
           <?php echo $value['name'];
           ?>
@@ -658,116 +666,116 @@ function waktusolat_admin() {
       </div>
       <?php
       break;
-			
-			case 'textarea':
-			?>
-			
-			<div class="rm_input rm_textarea">
-				<label for="<?php echo $value['id']; ?>">
-					<?php echo $value['name'];
-					?>
-				</label>
-				<textarea name="<?php echo $value['id']; ?>" type="<?php echo $value['type']; ?>" cols="" rows=""><?php if ( get_settings( $value['id'] ) != "") { echo trim(get_settings( $value['id'])); } else { echo trim($value['std']); }	?></textarea>
-				<small>
-					<?php echo $value['desc'];
-					?>
-				</small>
-				<div class="clearfix">
-				</div>
-			
-			</div>
-			
-			<?php
-			break;
-			
-			case 'select':
-			?>
-			
-			<div class="rm_input rm_select">
-				<label for="<?php echo $value['id']; ?>">
-					<?php echo $value['name'];
-					?>
-				</label>
-			
-				<select name="<?php echo $value['id']; ?>" id="<?php echo $value['id']; ?>">
-					<?php foreach ($value['options'] as $option) {
-					?>
-					<option <?php if (get_settings( $value['id'] ) == $option) { echo 'selected="selected"'; } ?>
-						><?php echo $option;
-						?>
-					</option><?php }
-					?>
-				</select>
-			
-				<small>
-					<?php echo $value['desc'];
-					?>
-				</small>
-				<div class="clearfix">
-				</div>
-			</div>
-			<?php
-			break;
-			
-			case "checkbox":
-			?>
-			
-			<div class="rm_input rm_checkbox">
-				<label for="<?php echo $value['id']; ?>">
-					<?php echo $value['name'];
-					?>
-				</label>
-			
-				<?php if(get_option($value['id'])){ $checked = "checked=\"checked\""; }else{ $checked = "";}
-				?>
-				<input type="checkbox" name="<?php echo $value['id']; ?>" id="<?php echo $value['id']; ?>" value="true" <?php echo $checked; ?>
-				/>
-			
-				<small>
-					<?php echo $value['desc'];
-					?>
-				</small>
-				<div class="clearfix">
-				</div>
-			</div>
-			<?php break;
-			
-			case "section":
+      
+      case 'textarea':
+      ?>
+      
+      <div class="ezws_input ezws_textarea">
+        <label for="<?php echo $value['id']; ?>">
+          <?php echo $value['name'];
+          ?>
+        </label>
+        <textarea name="<?php echo $value['id']; ?>" type="<?php echo $value['type']; ?>" cols="" rows=""><?php if ( get_settings( $value['id'] ) != "") { echo trim(get_settings( $value['id'])); } else { echo trim($value['std']); } ?></textarea>
+        <small>
+          <?php echo $value['desc'];
+          ?>
+        </small>
+        <div class="clearfix">
+        </div>
+      
+      </div>
+      
+      <?php
+      break;
+      
+      case 'select':
+      ?>
+      
+      <div class="ezws_input ezws_select">
+        <label for="<?php echo $value['id']; ?>">
+          <?php echo $value['name'];
+          ?>
+        </label>
+      
+        <select name="<?php echo $value['id']; ?>" id="<?php echo $value['id']; ?>">
+          <?php foreach ($value['options'] as $option) {
+          ?>
+          <option <?php if (get_settings( $value['id'] ) == $option) { echo 'selected="selected"'; } ?>
+            ><?php echo $option;
+            ?>
+          </option><?php }
+          ?>
+        </select>
+      
+        <small>
+          <?php echo $value['desc'];
+          ?>
+        </small>
+        <div class="clearfix">
+        </div>
+      </div>
+      <?php
+      break;
+      
+      case "checkbox":
+      ?>
+      
+      <div class="ezws_input ezws_checkbox">
+        <label for="<?php echo $value['id']; ?>">
+          <?php echo $value['name'];
+          ?>
+        </label>
+      
+        <?php if(get_option($value['id'])){ $checked = "checked=\"checked\""; }else{ $checked = "";}
+        ?>
+        <input type="checkbox" name="<?php echo $value['id']; ?>" id="<?php echo $value['id']; ?>" value="true" <?php echo $checked; ?>
+        />
+      
+        <small>
+          <?php echo $value['desc'];
+          ?>
+        </small>
+        <div class="clearfix">
+        </div>
+      </div>
+      <?php break;
+      
+      case "section":
 
-			$i++;
-			
-			?>
-<div class="rm_section">
-	<div class="rm_title">
-		<h3><?php echo $value['name']; ?></h3><span class="submit"><input name="save<?php echo $i; ?>" type="submit" value="Save changes" />
-		</span><div class="clearfix"></div></div>
-		<div class="rm_options">
+      $i++;
+      
+      ?>
+<div class="ezws_section">
+  <div class="ezws_title">
+    <h3><?php echo $value['name']; ?></h3><span class="submit"><input name="save<?php echo $i; ?>" type="submit" value="Save changes" />
+    </span><div class="clearfix"></div></div>
+    <div class="ezws_options">
 
-		<?php break;
+    <?php break;
 
-		}
-		}
-		?>
+    }
+    }
+    ?>
 
-		<input type="hidden" name="action" value="save" />
-		</form>
-		<form method="post">
-			<p class="submit">
-				<input name="reset" type="submit" value="Reset" />
-				<input type="hidden" name="action" value="reset" />
-			</p>
-		</form>
-		</div>
+    <input type="hidden" name="action" value="save" />
+    </form>
+    <form method="post">
+      <p class="submit">
+        <input name="reset" type="submit" value="Reset" />
+        <input type="hidden" name="action" value="reset" />
+      </p>
+    </form>
+    </div>
 
-		<?php
-		}
+    <?php
+    }
 
 add_action('admin_init', 'waktusolat_add_init');
 add_action('admin_menu', 'waktusolat_add_admin');
 
 function waktusolat_add_init() {
       $plgDir = plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ); 
-      wp_enqueue_style("functions", $plgDir."/style/admin.css", false, "1.0", "all");
+      wp_enqueue_style("functions", $plgDir."/style/admin.css", false, "1.1", "all");
       wp_enqueue_style( 'farbtastic' );
       wp_enqueue_script( 'farbtastic' );
 
