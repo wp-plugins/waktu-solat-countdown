@@ -1,10 +1,10 @@
 === Plugin Name ===
 Contributors: Eizil
 Donate link: http://denaihati.com/projek-waktu-solat
-Tags: prayer time, widget, sidebar
+Tags: prayer time, widget, sidebar, waktu solat, malaysia, jakim
 Requires at least: 3.0
 Tested up to: 3.2.1
-Stable tag: 1.3.5
+Stable tag: 1.3.6
 
 Showing prayer time with countdown
 
@@ -13,6 +13,8 @@ Showing prayer time with countdown
 This plugin will display current prayer time for areas within Malaysia, the countdown will show how long till the next prayer time arrived.
 
 Plugin ini akan waktu solat di kawasan sekitar Malaysia, jam randik akan memaparkan berapa lama tempoh sebelum masuk waktu solat yang seterusnya.
+
+Jika terdapat sebarang masalah, sila hubungi saya di [www.eizil.com](http://www.eizil.com "Hubungi saya") atau halaman support di [http://denaihati.com/projek-waktu-solat](http://denaihati.com/projek-waktu-solat "Projek Waktu Solat")
 
 
 == Installation ==
@@ -43,8 +45,13 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 
 == Upgrade Notice == 
 
+= 1.3.6 =
+* Background image uploader. 
+* Option to enable or disable hijri and greg date
+
+
 = 1.3.5 =
-- * CSS fixed. 
+* CSS fixed. 
 * Panel settings bug fixed 
 * Compressed Javascript and html
 
@@ -64,6 +71,10 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 
 
 == Changelog ==
+
+= 1.3.6 =
+* Background image uploader. 
+* Option to enable or disable hijri and greg date 28/10/2011
 
 = 1.3.5 =
 * CSS fixed. 

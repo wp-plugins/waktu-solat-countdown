@@ -3,8 +3,8 @@
 /*
 Plugin Name: Waktu Solat Countdown
 Plugin URI: http://denaihati.com/projek-waktu-solat
-Description: Plugin waktu solat beserta jam randik menunjukkan berapa lama sebelum waktu sebelumnya tiba. Projek dengan kerjasama Denaihati Network.
-Version: 1.3.5
+Description: Plugin waktu solat beserta jam randik menunjukkan berapa lama sebelum waktu sebelumnya tiba. Projek dengan kerjasama <a href="http://denaihati.com/projek-waktu-solat">Denaihati Network</a>.
+Version: 1.3.6
 Author: Mohd Hadihaizil Din
 Author URI: http://www.eizil.com
 License: GPL2
@@ -298,11 +298,18 @@ function waktuSolatMain($kod){
 ?>
 
 
-<div id="wscontainer" <?php if(get_option('ezws_bg_scheme')!= ""): echo 'style="background-color:'.get_option('ezws_bg_scheme').'"'; endif; ?> >
+<div id="wscontainer" <?php if(get_option('ezws_bg_enable') == "Yes"): echo 'style="background-repeat: '.get_option('ezws_bg_repeat').';  background-image: url('.get_option('ezws_bg_image').');"';
+                            elseif(get_option('ezws_bg_scheme')!= "" && get_option('ezws_bg_enable') == "No"): echo 'style="background-color:'.get_option('ezws_bg_scheme').'"'; endif; 
+                      ?> >
                 <div class="info_message" id="ezws_main" <?php if(get_option('ezws_textalign')!= ""): echo 'style="text-align:'.get_option('ezws_textalign').'"'; endif; ?>>
+                    
                     <span style="font-size: 20px"><?php echo $harijawi; ?></span><br />
+                    <?php if(get_option('ezws_greg_enable') == "Yes"): ?>
                     <?php echo $row[1]; ?> <br />
+                    <?php endif; ?>
+                    <?php if(get_option('ezws_hijri_enable') == "Yes"): ?>
                     <?php echo $hijri; ?> <br />
+                    <?php endif; ?>
                     <?php echo ucfirst(strtolower($namaKawasan['Nama']));  ?> <br />
                     <span id="waktusolat">
                     Now : <?=$now?> (<?=$nowtime?>) <br />
@@ -440,6 +447,27 @@ $ezwsoptions = array (
                     "type" => "section"),
                   array( "type" => "open"),
 
+                  array( "name" => "Show Hijri date?",
+                    "desc" => "Select if you want to show hijri date",
+                    "id" => $shortname."_hijri_enable",
+                    "type" => "select",
+                    "options" => array("Yes", "No"),
+                    "std" => "Yes"),
+                  
+                  array( "name" => "Show Gregorian date?",
+                    "desc" => "Select if you want to show Gregorian date",
+                    "id" => $shortname."_greg_enable",
+                    "type" => "select",
+                    "options" => array("No", "Yes"),
+                    "std" => "No"),  
+                  
+                  array( "name" => "Text Align",
+                    "desc" => "Choose text align",
+                    "id" => $shortname."_textalign",
+                    "type" => "select",
+                    "options" => array("center", "right", "left"),
+                    "std" => "center"),  
+                  
                   array( "name" => "Colour Scheme",
                     "desc" => "Select the colour scheme for the counter",
                     "id" => $shortname."_color_scheme",
@@ -447,18 +475,42 @@ $ezwsoptions = array (
                     "options" => array("default", "blue", "red", "green"),
                     "std" => "default"),
 
+
                   array( "name" => "Background Color",
                     "desc" => "Enter a custom background color",
                     "id" => $shortname."_bg_scheme",
                     "type" => "colorpicker",
                     "std" => "#FFF"),  
+                  
+                    
 
-                  array( "name" => "Text Align",
-                    "desc" => "Choose text align",
-                    "id" => $shortname."_textalign",
+                  array( "name" => "Custom Background Image",
+                    "type" => "subheader"),
+                  array( "type" => "open"),  
+
+                  array( "name" => "Enable background image?",
+                    "desc" => "Select if you want to enable custom background image",
+                    "id" => $shortname."_bg_enable",
                     "type" => "select",
-                    "options" => array("center", "right", "left"),
-                    "std" => "center"),
+                    "options" => array("No", "Yes"),
+                    "std" => "No"), 
+
+                  array( "name" => "Background image upload",  
+                    "desc" => "Use this option if you want to use custom background image",  
+                    "id" => $shortname."_bg_image",  
+                    "type" => "upload",  
+                    "std" => ""),   
+                  
+                  array( "name" => "Background Repeat?",
+                    "desc" => "Choose if you want your background repeat properties",
+                    "id" => $shortname."_bg_repeat",
+                    "type" => "select",
+                    "options" => array("no-repeat", "repeat", "repeat-x", "repeat-y"),
+                    "std" => "no-repeat"),  
+
+                  array( "name" => "Miscellaneous",
+                    "type" => "subheader"),
+                  array( "type" => "open"),  
 
                   array( "name" => "Enable custom css?",
                     "desc" => "Select if you want to enable custom css",
@@ -552,7 +604,8 @@ function waktusolat_add_admin() {
             foreach ($ezwsoptions as $value) { update_option( $value['id'], trim($_REQUEST[ $value['id'] ]) ); 
             }
 
-            foreach ($ezwsoptions as $value) {if( isset( $_REQUEST[ $value['id'] ] ) ) { update_option( $value['id'], trim($_REQUEST[ $value['id'] ])  ); } else { delete_option( $value['id'] ); } }
+            foreach ($ezwsoptions as $value) {
+                      if( isset( $_REQUEST[ $value['id'] ] ) ) { update_option( $value['id'], trim($_REQUEST[ $value['id'] ])  ); } else { delete_option( $value['id'] ); } }
 
                       header("Location: options-general.php?page=".plugin_basename ( dirname ( __FILE__ ))."&saved=true");
                 die;
@@ -739,7 +792,54 @@ function waktusolat_admin() {
         </div>
       </div>
       <?php break;
+
+
+      // tambahan case untuk handle image upload
+      case "upload":
+
+       ?>
+
+       <div class="ezws_input ezws_upload">
+
+        <label for="<?php echo $value['id']; ?>"><?php echo $value['name']; ?></label>  
+        <input id="<?php echo $value['id'] ?>_image" type="text" size="36" name="<?php echo $value['id'] ?>" value="<?php if ( get_settings( $value['id'] ) != "") { echo trim(get_settings( $value['id'])); } else { echo trim($value['std']); } ?>" />
+        <input id="<?php echo $value['id'] ?>_button" type="button" value="Upload Image" />
+
+        <small><?php echo $value['desc']; ?></small><div class="clearfix"></div>  
+
+      </div>
+      <script language="javascript" type="text/javascript">
+      jQuery(document).ready(function() {
+
+      jQuery('#<?php echo $value['id'] ?>_button').click(function() {
+       formfield = jQuery('#<?php echo $value['id'] ?>_image').attr('name');
+       tb_show('', 'media-upload.php?type=image&amp;TB_iframe=true');
+       return false;
+      });
+
+      window.send_to_editor = function(html) {
+       imgurl = jQuery('img',html).attr('src');
+       jQuery('#<?php echo $value['id'] ?>_image').val(imgurl);
+       tb_remove();
+      }
+
+      });
+      </script>
+
+       <?php  break;
       
+      case "subheader":
+
+      $i++;
+      
+      ?>
+      <div class="ezws_title">
+    <h3><img src="<?php echo plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ) ."/images/dome-th.png"; ?>" width="60" height="22" alt="Projek Waktu Solat" /><?php echo $value['name']; ?></h3><span class="submit"><input name="save<?php echo $i; ?>" type="submit" value="Save changes" />
+    </span><div class="clearfix"></div>
+        </div>
+
+    <?php break;
+       
       case "section":
 
       $i++;
@@ -747,7 +847,7 @@ function waktusolat_admin() {
       ?>
 <div class="ezws_section">
   <div class="ezws_title">
-    <h3><?php echo $value['name']; ?></h3><span class="submit"><input name="save<?php echo $i; ?>" type="submit" value="Save changes" />
+    <h3><img src="<?php echo plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ) ."/images/dome-th.png"; ?>" width="60" height="22" alt="Projek Waktu Solat" /><?php echo $value['name']; ?></h3><span class="submit"><input name="save<?php echo $i; ?>" type="submit" value="Save changes" />
     </span><div class="clearfix"></div></div>
     <div class="ezws_options">
 
@@ -774,12 +874,14 @@ add_action('admin_init', 'waktusolat_add_init');
 add_action('admin_menu', 'waktusolat_add_admin');
 
 function waktusolat_add_init() {
-      $plgDir = plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ); 
-      wp_enqueue_style("functions", $plgDir."/style/admin.css", false, "1.1", "all");
+      wp_enqueue_style("functions", plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) )."/style/admin.css", false, "1.1", "all");
       wp_enqueue_style( 'farbtastic' );
       wp_enqueue_script( 'farbtastic' );
+      wp_enqueue_script('media-upload');
+      wp_enqueue_script('thickbox');
+      wp_enqueue_style('thickbox');
+
 
       
     }
-
 ?>
