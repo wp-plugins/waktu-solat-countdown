@@ -543,16 +543,16 @@ $ezwsoptions = array (
 
 function waktusolat_add_admin() {
 
-        global $options;
+        global $ezwsoptions;
 
         if ( $_GET['page'] == plugin_basename ( dirname ( __FILE__ )) ) {
 
           if ( 'save' == $_REQUEST['action'] ) {
 
-            foreach ($options as $value) { update_option( $value['id'], trim($_REQUEST[ $value['id'] ]) ); 
+            foreach ($ezwsoptions as $value) { update_option( $value['id'], trim($_REQUEST[ $value['id'] ]) ); 
             }
 
-            foreach ($options as $value) {if( isset( $_REQUEST[ $value['id'] ] ) ) { update_option( $value['id'], trim($_REQUEST[ $value['id'] ])  ); } else { delete_option( $value['id'] ); } }
+            foreach ($ezwsoptions as $value) {if( isset( $_REQUEST[ $value['id'] ] ) ) { update_option( $value['id'], trim($_REQUEST[ $value['id'] ])  ); } else { delete_option( $value['id'] ); } }
 
                       header("Location: options-general.php?page=".plugin_basename ( dirname ( __FILE__ ))."&saved=true");
                 die;
@@ -560,7 +560,7 @@ function waktusolat_add_admin() {
               }
               else if( 'reset' == $_REQUEST['action'] ) {
 
-              foreach ($options as $value) {
+              foreach ($ezwsoptions as $value) {
                 delete_option( $value['id'] ); }
 
               header("Location: options-general.php?page=".plugin_basename ( dirname ( __FILE__ ))."&reset=true");
