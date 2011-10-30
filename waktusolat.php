@@ -4,7 +4,7 @@
 Plugin Name: Waktu Solat Countdown
 Plugin URI: http://denaihati.com/projek-waktu-solat
 Description: Plugin waktu solat beserta jam randik menunjukkan berapa lama sebelum waktu sebelumnya tiba. Projek dengan kerjasama <a href="http://denaihati.com/projek-waktu-solat">Denaihati Network</a>.
-Version: 1.3.6
+Version: 1.3.7
 Author: Mohd Hadihaizil Din
 Author URI: http://www.eizil.com
 License: GPL2
@@ -97,22 +97,15 @@ add_action('widgets_init', create_function('', 'return register_widget("WaktuSol
 
 // enqueue additional script untuk countdown
 function waktuSolatMethod() {
-   wp_enqueue_script('newscript1', plugins_url('/js/jquery-1.4.1.js', __FILE__), array('jquery'), '1.1', false);
-   wp_enqueue_script('newscript2', plugins_url('/js/jquery.lwtCountdown-1.0.js', __FILE__), array('jquery'), '1.1', false);
-   wp_enqueue_script('newscript3', plugins_url('/js/jquery.cookies.js', __FILE__), array('jquery'), '1.1', false);
-
+   wp_enqueue_script('newscript1', plugins_url('/js/jquery-waktusolat.js', __FILE__), array('jquery'), '1.1', true);
 
        if(get_option('ezws_color_scheme') != ""):
             $color = get_option('ezws_color_scheme');
        else:
             $color = "default";
        endif;     
-
        wp_register_style('waktusolat', plugins_url('/style/main_'.$color.'.css', __FILE__), false, 'All'); 
-       
        wp_enqueue_style('waktusolat');
-       
-
 
 }    
 
@@ -352,7 +345,6 @@ function waktuSolatMain($kod){
                 </div>
                 <!-- Countdown dashboard end -->
                 <script language="javascript" type="text/javascript">
-                  
                   jQuery(document).ready(function() {
                     // start countdown
                     $('#countdown_dashboard').countDown({
@@ -372,9 +364,11 @@ function waktuSolatMain($kod){
                           setTimeout(function() {
                             $('#complete_info_message').fadeOut("slow");
                           }, 10000);  
+                        <?php if(get_option('ezws_auto_refresh') == "Yes"): ?>
                           setTimeout(function() {
                               location.reload();
                           }, 60000); 
+                         <?php endif; ?> 
                           
                           $('#countdown_dashboard').setCountDown({
                             targetDate: {
@@ -422,7 +416,7 @@ function ezws_locator(){
         $kawasan = $wpdb->get_results("SELECT * FROM {$tableKod}",OBJECT);
         ?>
          <p>
-          <label for="kawasan"><?php _e('Kawasan:'); ?></label> 
+          <label for="kodKawasan"><?php _e('Kawasan:'); ?></label> 
           <select id="kodKawasan" name="kodKawasan" class="widefat" style="width:100%;">
           <?php foreach ($kawasan as $data): ?>
             <option value="<?php echo $data->Kod; ?>" <?php if ( $data->Kod == $_COOKIE["kodKawasan"] ) echo 'selected="selected"'; ?>><?php echo ucfirst(strtolower($data->Nama)); ?></option>
@@ -472,7 +466,7 @@ $ezwsoptions = array (
                     "desc" => "Select the colour scheme for the counter",
                     "id" => $shortname."_color_scheme",
                     "type" => "select",
-                    "options" => array("default", "blue", "red", "green"),
+                    "options" => array("default", "blue", "red", "green", "black"),
                     "std" => "default"),
 
 
@@ -524,70 +518,76 @@ $ezwsoptions = array (
                     "id" => $shortname."_custom_css",
                     "type" => "textarea",
                     "std" => "#wscontainer {
-  padding: 10px;  
-  width: 100%;
-  min-height: 130px;
-}
+                    padding: 10px;  
+                    width: 100%;
+                    min-height: 130px;
+                  }
 
-#countdown_dashboard {
-  width: 140px;
-  margin: 10px auto;
-}
+                  #countdown_dashboard {
+                    width: 140px;
+                    margin: 10px auto;
+                  }
 
-.dash {
-  width: 35px;
-  height: 45px;
-  background: transparent url('../images/dash.png') 0 0 no-repeat;
-  float: left;
-  margin-left: 8px;
-  position: relative;
-}
+                  .dash {
+                    width: 35px;
+                    height: 45px;
+                    background: transparent url('../images/dash.png') 0 0 no-repeat;
+                    float: left;
+                    margin-left: 8px;
+                    position: relative;
+                  }
 
-.dash .digit {
-  font-size: 16pt;
-  font-weight: bold;
-  float: left;
-  width: 17px;
-  text-align: center;
-  font-family: Times;
-  color: #555;
-  position: relative;
-}
+                  .dash .digit {
+                    font-size: 16pt;
+                    font-weight: bold;
+                    float: left;
+                    width: 17px;
+                    text-align: center;
+                    font-family: Times;
+                    color: #555;
+                    position: relative;
+                  }
 
-.dash_title {
-  position: absolute;
-  display: block;
-  bottom: 0px;
-  right: 0px;
-  font-size: 8pt;
-  font-weight: bold;
-  color: #555;
-  text-transform: uppercase;
-}
+                  .dash_title {
+                    position: absolute;
+                    display: block;
+                    bottom: 0px;
+                    right: 0px;
+                    font-size: 8pt;
+                    font-weight: bold;
+                    color: #555;
+                    text-transform: uppercase;
+                  }
 
-#loading {
-  text-align: center;
-  margin: 10px;
-  display: none;
-  position: absolute;
-  width: 100%;
-  top: 60px;
-}
+                  #loading {
+                    text-align: center;
+                    margin: 10px;
+                    display: none;
+                    position: absolute;
+                    width: 100%;
+                    top: 60px;
+                  }
 
-.info_message{
-  padding-top:10px;
-  padding-left: 5px;
-  width: 100%;
-  font-size: 8pt;
-  font-weight: bold;
-  text-align: center;
-}"),   
+                  .info_message{
+                    padding-top:10px;
+                    padding-left: 5px;
+                    width: 100%;
+                    font-size: 8pt;
+                    font-weight: bold;
+                    text-align: center;
+                  }"),   
                   array( "name" => "Show plugin credit?",
                     "desc" => "Select if you want to enable plugin credit at the bottom of widget",
                     "id" => $shortname."_credit",
                     "type" => "select",
                     "options" => array("No", "Yes"),
                     "std" => "Yes"),
+                  array( "name" => "Enable auto refresh?",
+                    "desc" => "Select if you want to enable auto refresh",
+                    "id" => $shortname."_auto_refresh",
+                    "type" => "select",
+                    "options" => array("No", "Yes"),
+                    "std" => "No"),   
 
                   array( "type" => "close")
                   );
@@ -601,11 +601,11 @@ function waktusolat_add_admin() {
 
           if ( 'save' == $_REQUEST['action'] ) {
 
-            foreach ($ezwsoptions as $value) { update_option( $value['id'], trim($_REQUEST[ $value['id'] ]) ); 
+            foreach ($ezwsoptions as $value) { update_option( $value['id'], $_REQUEST[ $value['id'] ] ); 
             }
 
             foreach ($ezwsoptions as $value) {
-                      if( isset( $_REQUEST[ $value['id'] ] ) ) { update_option( $value['id'], trim($_REQUEST[ $value['id'] ])  ); } else { delete_option( $value['id'] ); } }
+                      if( isset( $_REQUEST[ $value['id'] ] ) ) { update_option( $value['id'], $_REQUEST[ $value['id'] ]  ); } else { delete_option( $value['id'] ); } }
 
                       header("Location: options-general.php?page=".plugin_basename ( dirname ( __FILE__ ))."&saved=true");
                 die;
@@ -880,8 +880,5 @@ function waktusolat_add_init() {
       wp_enqueue_script('media-upload');
       wp_enqueue_script('thickbox');
       wp_enqueue_style('thickbox');
-
-
-      
     }
 ?>

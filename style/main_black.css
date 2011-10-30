@@ -1,0 +1,59 @@
+#wscontainer {
+	padding: 10px;	
+	width: 100%;
+	min-height: 130px;
+}
+
+#countdown_dashboard {
+	width: 140px;
+	margin: 10px auto;
+}
+
+.dash {
+	width: 35px;
+	height: 45px;
+	background: transparent url('../images/dash-black.png') 0 0 no-repeat;
+	float: left;
+	margin-left: 8px;
+	position: relative;
+}
+
+.dash .digit {
+	font-size: 16pt;
+	font-weight: bold;
+	float: left;
+	width: 17px;
+	text-align: center;
+	font-family: Times;
+	color: #FFF;
+	position: relative;
+}
+
+.dash_title {
+	position: absolute;
+	display: block;
+	bottom: 0px;
+	right: 0px;
+	font-size: 8pt;
+	font-weight: bold;
+	color: #555;
+	text-transform: uppercase;
+}
+
+#loading {
+	text-align: center;
+	margin: 10px;
+	display: none;
+	position: absolute;
+	width: 100%;
+	top: 60px;
+}
+
+.info_message{
+	padding-top:10px;
+	padding-left: 5px;
+	width: 100%;
+	font-size: 8pt;
+	font-weight: bold;
+	text-align: center;
+}
