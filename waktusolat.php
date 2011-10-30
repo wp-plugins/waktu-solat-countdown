@@ -4,7 +4,7 @@
 Plugin Name: Waktu Solat Countdown
 Plugin URI: http://denaihati.com/projek-waktu-solat
 Description: Plugin waktu solat beserta jam randik menunjukkan berapa lama sebelum waktu sebelumnya tiba. Projek dengan kerjasama <a href="http://denaihati.com/projek-waktu-solat">Denaihati Network</a>.
-Version: 1.3.7
+Version: 1.3.7.1
 Author: Mohd Hadihaizil Din
 Author URI: http://www.eizil.com
 License: GPL2
@@ -97,7 +97,12 @@ add_action('widgets_init', create_function('', 'return register_widget("WaktuSol
 
 // enqueue additional script untuk countdown
 function waktuSolatMethod() {
-   wp_enqueue_script('newscript1', plugins_url('/js/jquery-waktusolat.js', __FILE__), array('jquery'), '1.1', true);
+
+       wp_deregister_script( 'jquery' );
+       wp_register_script( 'jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js');
+       wp_enqueue_script( 'jquery' );
+
+       wp_enqueue_script('waktusolatjs', plugins_url('/js/jquery-waktusolat.js', __FILE__), array('jquery'), '1.2', true);
 
        if(get_option('ezws_color_scheme') != ""):
             $color = get_option('ezws_color_scheme');
@@ -345,9 +350,11 @@ function waktuSolatMain($kod){
                 </div>
                 <!-- Countdown dashboard end -->
                 <script language="javascript" type="text/javascript">
-                  jQuery(document).ready(function() {
+                  var ez = jQuery.noConflict();
+
+                  jQuery(document).ready(function(ez) {
                     // start countdown
-                    $('#countdown_dashboard').countDown({
+                    ez('#countdown_dashboard').countDown({
                       targetDate: {
                         'day':    <?php echo $tdate[0] ?>,
                         'month':  <?php echo $tdate[1] ?>,
@@ -357,12 +364,12 @@ function waktuSolatMain($kod){
                         'sec':    0
                       },
                       onComplete: function() { 
-                          $('#countdown_dashboard').stopCountDown();  
-                          $('#waktusolat').html("Now : <?=$next?> (<?=$nextime?>) <br />Next : <?=$future?> (<?=$futuretime?>) <br />");
-                          $('#complete_info_message').slideDown();
+                          ez('#countdown_dashboard').stopCountDown();  
+                          ez('#waktusolat').html("Now : <?=$next?> (<?=$nextime?>) <br />Next : <?=$future?> (<?=$futuretime?>) <br />");
+                          ez('#complete_info_message').slideDown();
                            // $('#countdown_dashboard').fadeOut();
                           setTimeout(function() {
-                            $('#complete_info_message').fadeOut("slow");
+                            ez('#complete_info_message').fadeOut("slow");
                           }, 10000);  
                         <?php if(get_option('ezws_auto_refresh') == "Yes"): ?>
                           setTimeout(function() {
@@ -370,7 +377,7 @@ function waktuSolatMain($kod){
                           }, 60000); 
                          <?php endif; ?> 
                           
-                          $('#countdown_dashboard').setCountDown({
+                          ez('#countdown_dashboard').setCountDown({
                             targetDate: {
                               'day':    <?php echo $tdate2[0] ?>,
                               'month':  <?php echo $tdate2[1] ?>,
@@ -380,27 +387,27 @@ function waktuSolatMain($kod){
                               'sec':    0
                             }
                           });       
-                          $('#countdown_dashboard').startCountDown();  
+                          ez('#countdown_dashboard').startCountDown();  
 
                            }
                     });
 
                   // selection untuk kod kawasan  
-                  $("#kodKawasan").change(function() { 
-                          $.cookie('kodKawasan', $("#kodKawasan").val(), { expires: 7, path: '/' });
+                  ez("#kodKawasan").change(function() { 
+                          ez.cookie('kodKawasan', ez("#kodKawasan").val(), { expires: 7, path: '/' });
                           setTimeout(function() {
                               location.reload();
                           }, 500); 
 
                   });  
                   // show hide div tukar kawasan
-                  $("a#hideDiv").click(function(){
-                    $('div#ezwssetting').show('slow');
-                    $("#hideDiv").hide('slow');
+                  ez("a#hideDiv").click(function(){
+                    ez('div#ezwssetting').show('slow');
+                    ez("#hideDiv").hide('slow');
                   });
-                  $("a#showDiv").click(function(){
-                    $('div#ezwssetting').hide('fast');
-                    $("#hideDiv").show('fast');
+                  ez("a#showDiv").click(function(){
+                    ez('div#ezwssetting').hide('fast');
+                    ez("#hideDiv").show('fast');
                   });
                     
                   });

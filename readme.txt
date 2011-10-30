@@ -4,7 +4,7 @@ Donate link: http://denaihati.com/projek-waktu-solat
 Tags: prayer time, widget, sidebar, waktu solat, malaysia, jakim
 Requires at least: 3.0
 Tested up to: 3.2.1
-Stable tag: 1.3.7
+Stable tag: 1.3.7.1
 
 Showing prayer time with countdown
 
@@ -45,6 +45,10 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 
 == Upgrade Notice == 
 
+= 1.3.7.1 =
+* Minor bug fixes for jQuery.
+
+
 = 1.3.7 =
 * Bug fixes - jQuery conflict with other plugins.
 * Additional counter style
@@ -76,6 +80,9 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 
 
 == Changelog ==
+
+= 1.3.7.1 =
+* Minor bug fixes for jQuery. 30/10/2011
 
 = 1.3.7 =
 * Bug fixes 
