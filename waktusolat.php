@@ -768,7 +768,7 @@ if(date('l', $todayTime) == "Sunday"):
 
                   // counter baru
                   (function() {
-                    $(document).ready(function() {GetCounter();});
+                    jQuery(document).ready(function() {GetCounter();});
 
                     function GetCounter() { 
                       var  dateFuture = new Date(<?php echo $tdate[2] ?>,<?php echo $tdate[1] ?>,<?php echo $tdate[0] ?>,<?php echo $nexthour; ?>,<?php echo $nextmin; ?>,0);
