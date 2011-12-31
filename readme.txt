@@ -1,18 +1,21 @@
 === Plugin Name ===
 Contributors: Eizil
 Donate link: http://denaihati.com/projek-waktu-solat
-Tags: prayer time, widget, sidebar, waktu solat, malaysia, jakim
+Tags: prayer time, widget, sidebar, waktu solat, world, world prayer time, prayer time countdown, geolocation
 Requires at least: 3.0
-Tested up to: 3.2.1
-Stable tag: 1.3.7.1
+Tested up to: 3.3
+Stable tag: 2.0
 
 Showing prayer time with countdown
 
 == Description ==
 
-This plugin will display current prayer time for areas within Malaysia, the countdown will show how long till the next prayer time arrived.
+This plugin will display current prayer time for all area in the World, the countdown will show how long till the next prayer time arrived.
 
-Plugin ini akan waktu solat di kawasan sekitar Malaysia, jam randik akan memaparkan berapa lama tempoh sebelum masuk waktu solat yang seterusnya.
+If you have any problem or want to translate this plugin, please contact me at [www.eizil.com](http://www.eizil.com "Hubungi saya") or use support page at [http://denaihati.com/projek-waktu-solat](http://denaihati.com/projek-waktu-solat "Projek Waktu Solat")
+
+
+Plugin ini akan waktu solat di kawasan di seluruh Dunia, jam randik akan memaparkan berapa lama tempoh sebelum masuk waktu solat yang seterusnya.
 
 Jika terdapat sebarang masalah, sila hubungi saya di [www.eizil.com](http://www.eizil.com "Hubungi saya") atau halaman support di [http://denaihati.com/projek-waktu-solat](http://denaihati.com/projek-waktu-solat "Projek Waktu Solat")
 
@@ -34,6 +37,17 @@ Untuk memasang plugin ini,
 1. Pergi ke Appearance > Widgets untuk menambah widget ke sidebar anda.
 
 == Frequently Asked Questions == 
+
+= FAQ =
+
+Can this plugin be use in an official website?
+- Yes, you can use this plugin anywhere you like as long as you keep the license intact.
+
+Can i suggest new functionality for this plugin?
+- Every suggestions are always welcome, please contact me at [www.eizil.com](http://www.eizil.com "Contact Me") or at support page [http://denaihati.com/projek-waktu-solat](http://denaihati.com/projek-waktu-solat "Projek Waktu Solat")
+
+
+
 = Soalan Lazim =
 
 Adakah plugin ini boleh digunakan pada laman web rasmi?
@@ -44,6 +58,12 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 
 
 == Upgrade Notice == 
+
+= 2.0 =
+* Major update 
+* New prayer time calculation
+* New counter design
+
 
 = 1.3.7.1 =
 * Minor bug fixes for jQuery.
@@ -80,6 +100,15 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 
 
 == Changelog ==
+
+= 2.0 =
+* Major update
+* New prayer time calculation
+* New counter design
+* Support World Prayer Time
+* Multi-lingual support
+* Geolocation detector
+* 
 
 = 1.3.7.1 =
 * Minor bug fixes for jQuery. 30/10/2011

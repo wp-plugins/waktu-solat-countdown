@@ -3,8 +3,8 @@
 /*
 Plugin Name: Waktu Solat Countdown
 Plugin URI: http://denaihati.com/projek-waktu-solat
-Description: Plugin waktu solat beserta jam randik menunjukkan berapa lama sebelum waktu sebelumnya tiba. Projek dengan kerjasama <a href="http://denaihati.com/projek-waktu-solat">Denaihati Network</a>.
-Version: 1.3.7.1
+Description: Prayer Time Plugin with countdown, a collaboration project with <a href="http://denaihati.com/projek-waktu-solat">Denaihati Network</a>.
+Version: 2.0
 Author: Mohd Hadihaizil Din
 Author URI: http://www.eizil.com
 License: GPL2
@@ -25,12 +25,17 @@ License: GPL2
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-date_default_timezone_set('Asia/Kuala_Lumpur');
+
+function waktusolat_init() {
+    load_plugin_textdomain('wpwsc', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+}
+
+add_action('init', 'waktusolat_init');
+
 
 include "Hijri_GregorianConvert.class"; // class untuk convert gregorian ke hijri
-include_once('waktusolat-init.php');
+include('PrayTime.php');                // prayer time calculation
 
-register_activation_hook(__FILE__,'ezwaktu_solat_install');
 
 // Widget section
 
@@ -50,10 +55,10 @@ class WaktuSolatWidget extends WP_Widget {
               <?php echo $before_widget; ?>
                   <?php if ( $title )
                         echo $before_title . $title . $after_title; ?>
-                  <?php if(isset($_COOKIE["kodKawasan"]) && $_COOKIE["kodKawasan"] != ""):
-                              waktuSolatMain($_COOKIE["kodKawasan"]);
+                  <?php if(isset($_COOKIE["latitude"]) && isset($_COOKIE["longitude"]) && $_COOKIE["latitude"] != "" && $_COOKIE["longitude"] != ""):
+                              waktuSolatMain($_COOKIE['latitude'], $_COOKIE['longitude'], $instance['timezone'], $instance['calcmethod']);
                         else:      
-                              waktuSolatMain($instance['kawasan']);    
+                              waktuSolatMain($instance['latitude'], $instance['longitude'], $instance['timezone'], $instance['calcmethod']);
                         endif;      
                   ?>  
              
@@ -65,7 +70,10 @@ class WaktuSolatWidget extends WP_Widget {
     function update($new_instance, $old_instance) {
         $instance = $old_instance;
         $instance['title'] = strip_tags($new_instance['title']);
-        $instance['kawasan'] = $new_instance['kawasan'];
+        $instance['latitude'] = $new_instance['latitude'];
+        $instance['longitude'] = $new_instance['longitude'];
+        $instance['timezone'] = $new_instance['timezone'];
+        $instance['calcmethod'] = $new_instance['calcmethod'];
         return $instance;
     }
 
@@ -73,22 +81,178 @@ class WaktuSolatWidget extends WP_Widget {
     function form($instance) {
         global $wpdb;
         $title = esc_attr($instance['title']);
+        $latitude = esc_attr($instance['latitude']);
+        $longitude = esc_attr($instance['longitude']);
+        $timezone = esc_attr($instance['timezone']);
+        $calcmethod = esc_attr($instance['calcmethod']);
         $tableKod = $wpdb->prefix."waktusolatkod2";  
-        $kawasan = $wpdb->get_results("SELECT * FROM {$tableKod}",OBJECT);
-        ?>
+        $timezones = array(
+                'Pacific/Midway'    => "(GMT-11:00) Midway Island",
+                'US/Samoa'          => "(GMT-11:00) Samoa",
+                'US/Hawaii'         => "(GMT-10:00) Hawaii",
+                'US/Alaska'         => "(GMT-09:00) Alaska",
+                'US/Pacific'        => "(GMT-08:00) Pacific Time (US &amp; Canada)",
+                'America/Tijuana'   => "(GMT-08:00) Tijuana",
+                'US/Arizona'        => "(GMT-07:00) Arizona",
+                'US/Mountain'       => "(GMT-07:00) Mountain Time (US &amp; Canada)",
+                'America/Chihuahua' => "(GMT-07:00) Chihuahua",
+                'America/Mazatlan'  => "(GMT-07:00) Mazatlan",
+                'America/Mexico_City' => "(GMT-06:00) Mexico City",
+                'America/Monterrey' => "(GMT-06:00) Monterrey",
+                'Canada/Saskatchewan' => "(GMT-06:00) Saskatchewan",
+                'US/Central'        => "(GMT-06:00) Central Time (US &amp; Canada)",
+                'US/Eastern'        => "(GMT-05:00) Eastern Time (US &amp; Canada)",
+                'US/East-Indiana'   => "(GMT-05:00) Indiana (East)",
+                'America/Bogota'    => "(GMT-05:00) Bogota",
+                'America/Lima'      => "(GMT-05:00) Lima",
+                'America/Caracas'   => "(GMT-04:30) Caracas",
+                'Canada/Atlantic'   => "(GMT-04:00) Atlantic Time (Canada)",
+                'America/La_Paz'    => "(GMT-04:00) La Paz",
+                'America/Santiago'  => "(GMT-04:00) Santiago",
+                'Canada/Newfoundland'  => "(GMT-03:30) Newfoundland",
+                'America/Buenos_Aires' => "(GMT-03:00) Buenos Aires",
+                'Greenland'         => "(GMT-03:00) Greenland",
+                'Atlantic/Stanley'  => "(GMT-02:00) Stanley",
+                'Atlantic/Azores'   => "(GMT-01:00) Azores",
+                'Atlantic/Cape_Verde' => "(GMT-01:00) Cape Verde Is.",
+                'Africa/Casablanca' => "(GMT) Casablanca",
+                'Europe/Dublin'     => "(GMT) Dublin",
+                'Europe/Lisbon'     => "(GMT) Lisbon",
+                'Europe/London'     => "(GMT) London",
+                'Africa/Monrovia'   => "(GMT) Monrovia",
+                'Europe/Amsterdam'  => "(GMT+01:00) Amsterdam",
+                'Europe/Belgrade'   => "(GMT+01:00) Belgrade",
+                'Europe/Berlin'     => "(GMT+01:00) Berlin",
+                'Europe/Bratislava' => "(GMT+01:00) Bratislava",
+                'Europe/Brussels'   => "(GMT+01:00) Brussels",
+                'Europe/Budapest'   => "(GMT+01:00) Budapest",
+                'Europe/Copenhagen' => "(GMT+01:00) Copenhagen",
+                'Europe/Ljubljana'  => "(GMT+01:00) Ljubljana",
+                'Europe/Madrid'     => "(GMT+01:00) Madrid",
+                'Europe/Paris'      => "(GMT+01:00) Paris",
+                'Europe/Prague'     => "(GMT+01:00) Prague",
+                'Europe/Rome'       => "(GMT+01:00) Rome",
+                'Europe/Sarajevo'   => "(GMT+01:00) Sarajevo",
+                'Europe/Skopje'     => "(GMT+01:00) Skopje",
+                'Europe/Stockholm'  => "(GMT+01:00) Stockholm",
+                'Europe/Vienna'     => "(GMT+01:00) Vienna",
+                'Europe/Warsaw'     => "(GMT+01:00) Warsaw",
+                'Europe/Zagreb'     => "(GMT+01:00) Zagreb",
+                'Europe/Athens'     => "(GMT+02:00) Athens",
+                'Europe/Bucharest'  => "(GMT+02:00) Bucharest",
+                'Africa/Cairo'      => "(GMT+02:00) Cairo",
+                'Africa/Harare'     => "(GMT+02:00) Harare",
+                'Europe/Helsinki'   => "(GMT+02:00) Helsinki",
+                'Europe/Istanbul'   => "(GMT+02:00) Istanbul",
+                'Asia/Jerusalem'    => "(GMT+02:00) Jerusalem",
+                'Europe/Kiev'       => "(GMT+02:00) Kyiv",
+                'Europe/Minsk'      => "(GMT+02:00) Minsk",
+                'Europe/Riga'       => "(GMT+02:00) Riga",
+                'Europe/Sofia'      => "(GMT+02:00) Sofia",
+                'Europe/Tallinn'    => "(GMT+02:00) Tallinn",
+                'Europe/Vilnius'    => "(GMT+02:00) Vilnius",
+                'Asia/Baghdad'      => "(GMT+03:00) Baghdad",
+                'Asia/Kuwait'       => "(GMT+03:00) Kuwait",
+                'Europe/Moscow'     => "(GMT+03:00) Moscow",
+                'Africa/Nairobi'    => "(GMT+03:00) Nairobi",
+                'Asia/Riyadh'       => "(GMT+03:00) Riyadh",
+                'Europe/Volgograd'  => "(GMT+03:00) Volgograd",
+                'Asia/Tehran'       => "(GMT+03:30) Tehran",
+                'Asia/Baku'         => "(GMT+04:00) Baku",
+                'Asia/Muscat'       => "(GMT+04:00) Muscat",
+                'Asia/Tbilisi'      => "(GMT+04:00) Tbilisi",
+                'Asia/Yerevan'      => "(GMT+04:00) Yerevan",
+                'Asia/Kabul'        => "(GMT+04:30) Kabul",
+                'Asia/Yekaterinburg' => "(GMT+05:00) Ekaterinburg",
+                'Asia/Karachi'      => "(GMT+05:00) Karachi",
+                'Asia/Tashkent'     => "(GMT+05:00) Tashkent",
+                'Asia/Kolkata'      => "(GMT+05:30) Kolkata",
+                'Asia/Kathmandu'    => "(GMT+05:45) Kathmandu",
+                'Asia/Almaty'       => "(GMT+06:00) Almaty",
+                'Asia/Dhaka'        => "(GMT+06:00) Dhaka",
+                'Asia/Novosibirsk'  => "(GMT+06:00) Novosibirsk",
+                'Asia/Bangkok'      => "(GMT+07:00) Bangkok",
+                'Asia/Jakarta'      => "(GMT+07:00) Jakarta",
+                'Asia/Krasnoyarsk'  => "(GMT+07:00) Krasnoyarsk",
+                'Asia/Chongqing'    => "(GMT+08:00) Chongqing",
+                'Asia/Hong_Kong'    => "(GMT+08:00) Hong Kong",
+                'Asia/Irkutsk'      => "(GMT+08:00) Irkutsk",
+                'Asia/Kuala_Lumpur' => "(GMT+08:00) Kuala Lumpur",
+                'Australia/Perth'   => "(GMT+08:00) Perth",
+                'Asia/Singapore'    => "(GMT+08:00) Singapore",
+                'Asia/Taipei'       => "(GMT+08:00) Taipei",
+                'Asia/Ulaanbaatar'  => "(GMT+08:00) Ulaan Bataar",
+                'Asia/Urumqi'       => "(GMT+08:00) Urumqi",
+                'Asia/Seoul'        => "(GMT+09:00) Seoul",
+                'Asia/Tokyo'        => "(GMT+09:00) Tokyo",
+                'Asia/Yakutsk'      => "(GMT+09:00) Yakutsk",
+                'Australia/Adelaide' => "(GMT+09:30) Adelaide",
+                'Australia/Darwin'  => "(GMT+09:30) Darwin",
+                'Australia/Brisbane' => "(GMT+10:00) Brisbane",
+                'Australia/Canberra' => "(GMT+10:00) Canberra",
+                'Pacific/Guam'      => "(GMT+10:00) Guam",
+                'Australia/Hobart'  => "(GMT+10:00) Hobart",
+                'Australia/Melbourne' => "(GMT+10:00) Melbourne",
+                'Pacific/Port_Moresby' => "(GMT+10:00) Port Moresby",
+                'Australia/Sydney'  => "(GMT+10:00) Sydney",
+                'Asia/Vladivostok'  => "(GMT+10:00) Vladivostok",
+                'Asia/Magadan'      => "(GMT+11:00) Magadan",
+                'Pacific/Auckland'  => "(GMT+12:00) Auckland",
+                'Pacific/Fiji'      => "(GMT+12:00) Fiji",
+                'Asia/Kamchatka'    => "(GMT+12:00) Kamchatka",
+            );   
+         $calcmethods = array(      
+                              '0'   => "Ithna Ashari",
+                              '1'   => "University of Islamic Sciences, Karachi",
+                              '2'    => "Islamic Society of North America (ISNA)",
+                              '3'    => "Muslim World League (MWL)",
+                              '4'    => "Umm al-Qura, Makkah",
+                              '5'    => "Egyptian General Authority of Survey",
+                              '7'    => "Institute of Geophysics, University of Tehran",
+            );
+        echo '
          <p>
-          <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label> 
-          <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" />
+          <label for="'.$this->get_field_id('title').'">'. __('Title', 'wpwsc').':</label> 
+          <input class="widefat" id="'. $this->get_field_id('title').'" name="'.$this->get_field_name('title').'" type="text" value="'. $title.'" />
         </p>
         <p>
-          <label for="<?php echo $this->get_field_id( 'kawasan' ); ?>"><?php _e('Kawasan:'); ?></label> 
-          <select id="<?php echo $this->get_field_id( 'kawasan' ); ?>" name="<?php echo $this->get_field_name( 'kawasan' ); ?>" class="widefat" style="width:100%;">
-          <?php foreach ($kawasan as $data): ?>
-            <option value="<?php echo $data->Kod; ?>" <?php if ( $data->Kod == $instance['kawasan'] ) echo 'selected="selected"'; ?>><?php echo $data->Nama ?></option>
-              <?php endforeach; ?>
-          </select>
+          <label for="'.$this->get_field_id( 'latitude' ).'">'. __('Latitude', 'wpwsc').':</label> 
+          <input class="widefat" id="'. $this->get_field_id('latitude').'" name="'. $this->get_field_name('latitude').'" type="text" value="'. $latitude.'" />
         </p>
-        <?php 
+        <p>
+          <label for="'.$this->get_field_id( 'longitude' ).'">'. __('Longitude', 'wpwsc').':</label> 
+          <input class="widefat" id="'. $this->get_field_id('longitude').'" name="'. $this->get_field_name('longitude').'" type="text" value="'. $longitude.'" />
+        </p>
+        <p>
+          <label for="'.$this->get_field_id( 'timezone' ).'">'. __('Timezone', 'wpwsc').':</label> 
+          <select class="widefat" id="'. $this->get_field_id('timezone').'" name="'. $this->get_field_name('timezone').'"/>';
+          foreach($timezones as $val => $nam):
+            if($val == $timezone):
+               $selected = 'selected="selected"';
+            else:
+               $selected = "";
+            endif;   
+            echo '<option value="'.$val.'" '.$selected.' >'.$nam.'</option>';
+          endforeach;
+        echo '</select></p>
+        <p>
+          <label for="'.$this->get_field_id( 'calcmethod' ).'">'. __('Calculation Method', 'wpwsc').':</label> 
+          <select class="widefat" id="'. $this->get_field_id('calcmethod').'" name="'. $this->get_field_name('calcmethod').'"/>';
+          foreach($calcmethods as $valc => $namc):
+            if($valc == $calcmethod):
+               $selc = 'selected="selected"';
+            else:
+               $selc = "";
+            endif;   
+            echo '<option value="'.$valc.'" '.$selc.' >'.$namc.'</option>';
+          endforeach;
+        echo '</select></p>';
+
+
+         
+
+
+        
     }
 
 } // class WaktuSolatWidget
@@ -99,10 +263,8 @@ add_action('widgets_init', create_function('', 'return register_widget("WaktuSol
 function waktuSolatMethod() {
 
        wp_deregister_script( 'jquery' );
-       wp_register_script( 'jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js');
+       wp_register_script( 'jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js');
        wp_enqueue_script( 'jquery' );
-
-       wp_enqueue_script('waktusolatjs', plugins_url('/js/jquery-waktusolat.js', __FILE__), array('jquery'), '1.2', true);
 
        if(get_option('ezws_color_scheme') != ""):
             $color = get_option('ezws_color_scheme');
@@ -116,322 +278,536 @@ function waktuSolatMethod() {
 
 add_action('wp_enqueue_scripts', 'waktuSolatMethod');
 
-function waktuSolatMain($kod){
-            global $wpdb;
+function waktuSolatMain($lat, $long, $timezone, $calc){
+
+        if($timezone == ""):
+            $timez0n3 = "Asia/Kuala_Lumpur ";
+        else:
+            $timez0n3 = $timezone;
+        endif;
+
+        date_default_timezone_set($timez0n3);
+    
+        $today = date("d-m-Y", strtotime('today'));                 // tarikh harini.
+        $yesterday = date("d-m-Y", strtotime('yesterday'));         // tarikh semalam
+        $tomorrow = date("d-m-Y", strtotime('tomorrow'));           // tarikh esok
+        $time = strtotime(date("d-m-Y G:i:s"));                     // time sekarang untuk comparison
+
+        $tdate = explode ("-", $today);
+        $tdate2 = explode ("-", $today);
+
+        //create date conversion.
+        $DateConv=new Hijri_GregorianConvert; 
+        $hijri = $DateConv->GregorianToHijri(date("Y/m/d"),"YYYY/MM/DD");
+
+        // create query untuk data dari class.  
+        if($calc == ""):
+            $calc = "5";
+        endif;
+
+        $prayTime = new PrayTime($calc);
+
+        $todayTime = strtotime('today');                // tarikh harini.
+        $yesterdayTime = strtotime('yesterday');         // tarikh semalam
+        $tomorrowTime = strtotime('tomorrow');           // tarikh esok
+
+        if($lat == ""):
+            $lat = "3.13333";
+        endif;
+
+        if($long == ""):
+            $long = "101.7";
+        endif;
+
+        $latitude = $lat;          //3.13333;101.7 KL
+        $longitude = $long;
+
+        $timezones = array(
+                'Pacific/Midway'    => "-11",
+                'US/Samoa'          => "-11",
+                'US/Hawaii'         => "-10",
+                'US/Alaska'         => "-9",
+                'US/Pacific'        => "-8",
+                'America/Tijuana'   => "-8",
+                'US/Arizona'        => "-7",
+                'US/Mountain'       => "-7",
+                'America/Chihuahua' => "-7",
+                'America/Mazatlan'  => "07",
+                'America/Mexico_City' => "-6",
+                'America/Monterrey' => "-6",
+                'Canada/Saskatchewan' => "-6",
+                'US/Central'        => "-6",
+                'US/Eastern'        => "-5",
+                'US/East-Indiana'   => "-5",
+                'America/Bogota'    => "-5",
+                'America/Lima'      => "-5",
+                'America/Caracas'   => "-4:30",
+                'Canada/Atlantic'   => "-4",
+                'America/La_Paz'    => "-4",
+                'America/Santiago'  => "-4",
+                'Canada/Newfoundland'  => "-3:30",
+                'America/Buenos_Aires' => "-3",
+                'Greenland'         => "-3",
+                'Atlantic/Stanley'  => "-2",
+                'Atlantic/Azores'   => "-1",
+                'Atlantic/Cape_Verde' => "-1",
+                'Africa/Casablanca' => "0",
+                'Europe/Dublin'     => "0",
+                'Europe/Lisbon'     => "0",
+                'Europe/London'     => "0",
+                'Africa/Monrovia'   => "0",
+                'Europe/Amsterdam'  => "+1",
+                'Europe/Belgrade'   => "+1",
+                'Europe/Berlin'     => "+1",
+                'Europe/Bratislava' => "+1",
+                'Europe/Brussels'   => "+1",
+                'Europe/Budapest'   => "+1",
+                'Europe/Copenhagen' => "+1",
+                'Europe/Ljubljana'  => "+1",
+                'Europe/Madrid'     => "+1",
+                'Europe/Paris'      => "+1",
+                'Europe/Prague'     => "+1",
+                'Europe/Rome'       => "+1",
+                'Europe/Sarajevo'   => "+1",
+                'Europe/Skopje'     => "+1",
+                'Europe/Stockholm'  => "+1",
+                'Europe/Vienna'     => "+1",
+                'Europe/Warsaw'     => "+1",
+                'Europe/Zagreb'     => "+1",
+                'Europe/Athens'     => "+2",
+                'Europe/Bucharest'  => "+2",
+                'Africa/Cairo'      => "+2",
+                'Africa/Harare'     => "+2",
+                'Europe/Helsinki'   => "+2",
+                'Europe/Istanbul'   => "+2",
+                'Asia/Jerusalem'    => "+2",
+                'Europe/Kiev'       => "+2",
+                'Europe/Minsk'      => "+2",
+                'Europe/Riga'       => "+2",
+                'Europe/Sofia'      => "+2",
+                'Europe/Tallinn'    => "+2",
+                'Europe/Vilnius'    => "+2",
+                'Asia/Baghdad'      => "+3",
+                'Asia/Kuwait'       => "+3",
+                'Europe/Moscow'     => "+3",
+                'Africa/Nairobi'    => "+3",
+                'Asia/Riyadh'       => "+3",
+                'Europe/Volgograd'  => "+3",
+                'Asia/Tehran'       => "+3:30",
+                'Asia/Baku'         => "+4",
+                'Asia/Muscat'       => "+4",
+                'Asia/Tbilisi'      => "+4",
+                'Asia/Yerevan'      => "+4",
+                'Asia/Kabul'        => "+4:30",
+                'Asia/Yekaterinburg' => "+5",
+                'Asia/Karachi'      => "+5",
+                'Asia/Tashkent'     => "+5",
+                'Asia/Kolkata'      => "+5:30",
+                'Asia/Kathmandu'    => "+5:45",
+                'Asia/Almaty'       => "+6",
+                'Asia/Dhaka'        => "+6",
+                'Asia/Novosibirsk'  => "+6",
+                'Asia/Bangkok'      => "+7",
+                'Asia/Jakarta'      => "+7",
+                'Asia/Krasnoyarsk'  => "+7",
+                'Asia/Chongqing'    => "+8",
+                'Asia/Hong_Kong'    => "+8",
+                'Asia/Irkutsk'      => "+8",
+                'Asia/Kuala_Lumpur' => "+8",
+                'Australia/Perth'   => "+8",
+                'Asia/Singapore'    => "+8",
+                'Asia/Taipei'       => "+8",
+                'Asia/Ulaanbaatar'  => "+8",
+                'Asia/Urumqi'       => "+8",
+                'Asia/Seoul'        => "+9",
+                'Asia/Tokyo'        => "+9",
+                'Asia/Yakutsk'      => "+9",
+                'Australia/Adelaide' => "+9:30",
+                'Australia/Darwin'  => "+9:30",
+                'Australia/Brisbane' => "+10",
+                'Australia/Canberra' => "+10",
+                'Pacific/Guam'      => "+10",
+                'Australia/Hobart'  => "+10",
+                'Australia/Melbourne' => "+10",
+                'Pacific/Port_Moresby' => "+10",
+                'Australia/Sydney'  => "+10",
+                'Asia/Vladivostok'  => "+10",
+                'Asia/Magadan'      => "+11",
+                'Pacific/Auckland'  => "+12",
+                'Pacific/Fiji'      => "+12",
+                'Asia/Kamchatka'    => "+12",
+            );    
+        
+        $timeZone = "+8";
+
+        foreach($timezones as $val => $tc0de):
             
-            $today = date("d-m-Y", strtotime('today'));                 // tarikh harini.
-            $yesterday = date("d-m-Y", strtotime('yesterday'));         // tarikh semalam
-            $tomorrow = date("d-m-Y", strtotime('tomorrow'));           // tarikh esok
-            $time = strtotime(date("d-m-Y G:i:s"));                     // time sekarang untuk comparison
+            if($val == $timezone):
+                  $timeZone = $tc0de;
+            break;                  
+            endif;
+        
+        endforeach;   
 
-            $tdate = explode ("-", $today);
-            $tdate2 = explode ("-", $today);
+        $dataYes = $prayTime->getPrayerTimes($yesterdayTime, $latitude, $longitude, $timeZone);
+        $dataTod = $prayTime->getPrayerTimes($todayTime, $latitude, $longitude, $timeZone);
+        $dataTmr = $prayTime->getPrayerTimes($tomorrowTime, $latitude, $longitude, $timeZone);
 
-            //create date conversion.
-            $DateConv=new Hijri_GregorianConvert; 
-            $hijri = $DateConv->GregorianToHijri(date("Y/m/d"),"YYYY/MM/DD");
+        // check kalau waktu skang belum kul 23:50 tapi dah lebih waktu isyak
+        if(date("G:i:s") < "23:59" && strtotime(date("G:i:s")) > strtotime($dataTmr[0]) ):
+                // kalau data skang Isyak dan lebih waktu isyak, create query baru.
+                if( $time > strtotime($dataTod[6])):
+                  // dapatkan nama ngan waktu isyak harini
+                  $nowtime = $dataTod[6];
+                  $now = __('Isha', 'wpwsc');
 
-            // create query untuk data dari database.  
-            $table = $wpdb->prefix."waktusolat2";  
-            $tableKod = $wpdb->prefix."waktusolatkod2";  
-            // query data harini
-            $row   = $wpdb->get_row("SELECT * FROM $table WHERE tarikh = '$today' AND Kod = '$kod' LIMIT 1", ARRAY_N);
-            // query data esok
-            $row2  = $wpdb->get_row("SELECT * FROM $table WHERE tarikh = '$tomorrow' AND Kod = '$kod' LIMIT 1", ARRAY_N);
-            // query data semalam
-            $row3  = $wpdb->get_row("SELECT * FROM $table WHERE tarikh = '$yesterday' AND Kod = '$kod' LIMIT 1", ARRAY_N);
-            $namaKawasan  = $wpdb->get_row("SELECT * FROM $tableKod WHERE Kod = '$kod' LIMIT 1", ARRAY_A );
+                  // dapatkan nama ngan waktu subuh esok
+                  $futuretime = $dataTmr[1];
 
-            // control untuk comparison waktu isyak dan imsak
-            $timeC = explode("-", $row[3]);
-            $timeD = explode("-", $row[9]);
+                  //asingkan jam dan minit untuk imsak esok
+                  $t     = explode(":", $dataTmr[0]);
+                  $nexthour = $t[0];
+                  $nextmin  = $t[1]-10;
+                  $next = __('Imsak', 'wpwsc');
+                  // dapatkan nama ngan waktu imsak esok
+                  $nextime = $nexthour.":".$nextmin ;
 
-            for($c = 4; $c < 11; $c++):
-                
-                $data = explode("-", $row[$c]);
-                $data2 = explode("-", $row[$c-1]);
-                $data3 = explode("-", $row[$c+1]);     
-
-
-                // check kalau waktu skang belum kul 23:50 tapi dah lebih waktu isyak
-                if(date("G:i:s") < "23:59" && strtotime(date("G:i:s")) > strtotime($row[1]." ".$timeD[1]) ):
-                            // kalau data skang Isyak dan lebih waktu isyak, create query baru.
-                            if($data2[0] == "Isyak" && $time > strtotime($row[1]." ".$timeD[1])):
-                              // dapatkan nama ngan waktu isyak harini
-                              $now = $data2[0];
-                              $nowtime = $data2[1];
-
-                              // dapatkan nama ngan waktu imsak esok
-                              $data4 = explode("-", $row2[3]);
-                              $next = $data4[0];
-                              $nextime = $data4[1];
-
-                              // dapatkan nama ngan waktu subuh esok
-                              $data5 = explode("-", $row2[4]);
-                              $future = $data5[0];
-                              $futuretime = $data5[1];
-
-                              //asingkan jam dan minit untuk imsak esok
-                              $t     = explode(":", $data4[1]);
-                              $nexthour = $t[0];
-                              $nextmin  = $t[1];
-                              //asingkan jam dan minit untuk subuh esok
-                              $t2     = explode(":", $data5[1]);
-                              $nexthour2 = $t2[0];
-                              $nextmin2  = $t2[1];
-                              // tukar tarikh jadi esok. 
-                              $tdate = explode ("-", $tomorrow);
-                              $tdate2 = explode ("-", $tomorrow);
-                            endif;  
-                    // kalau dah lebih kul 12 malam...         
-                    elseif(date("G:i:s") > "0:00"):
-                            // check data adalah Isyak, dan time sekarang belum masuk waktu imsak.
-                            if($data2[0] == "Isyak" && $time < strtotime($row[1]." ".$timeC[1])): 
-                              // dapatkan nama ngan waktu isyak semalam
-                              $data6 = explode("-", $row3[9]);
-                              $now = $data6[0];
-                              $nowtime = $data6[1];  
-                               
-                              // dapatkan nama ngan waktu imsak harini  
-                              $data7 = explode("-", $row[3]);
-                              // Print out waktu dan nama  
-                              $next  = $data7[0];
-                              $nextime  = $data7[1];
-                              // asingkan jam dan minit dari data 
-                              $t     = explode(":", $data7[1]);
-                              $nexthour = $t[0];          
-                              $nextmin  = $t[1];
-                              
-                              // dapatkan nama ngan waktu subuh harini  
-                              $data8 = explode("-", $row[4]);
-                              $future = $data8[0];
-                              $futuretime = $data8[1];
-                              // asingkan jam dan minit dari data
-                              $t2     = explode(":", $data8[1]);
-                              $nexthour2 = $t2[0];
-                              $nextmin2  = $t2[1];
-                              // kekalkan tarikh untuk atas bawah harini. 
-                              $tdate = explode ("-", $today);
-                              $tdate2 = explode ("-", $today);
-                            endif;    
-                               
-                    endif;
-                
-                               
-               
-                if ($time < strtotime($row[1]." ".$data[1]) && $time > strtotime($row[1]." ".$data2[1])):
-                    // check kalau waktu Maghrib
-                    if($data2[0] == "Maghrib"): 
-                        // dapatkan nama dan waktu maghrib harini
-                        $now  = $data2[0];
-                        $nowtime = $data2[1];
-                        // dapatkan nama dan waktu isyak harini
-                        $next = $data[0]; 
-                        $nextime = $data[1];
-
-                        // asingkan jam dan minit untuk waktu isyak harini
-                        $t     = explode(":", $data[1]);
-                        $nexthour = $t[0];
-                        $nextmin  = $t[1];
-
-                        // dapatkan nama dan waktu imsak esok
-                        $dataX = explode("-", $row2[3]);
-
-                        $future = $dataX[0];
-                        $futuretime = $dataX[1];
-                        // asingkan jam dan minit untuk waktu imsak esok 
-                        $t2     = explode(":", $dataX[1]);
-                        $nexthour2 = $t2[0];
-                        $nextmin2  = $t2[1];
-                        // asingkan tarikh untuk next kepada harini, dan future kepada esok
-                        $tdate = explode ("-", $today);
-                        $tdate2 = explode ("-", $tomorrow);
-                    else:
-                    
-                    // dapatkan nama dan waktu solat  
-                    $now  = $data2[0];
-                    $nowtime = $data2[1];
-                    // dapatkan nama dan waktu solat seterusnya
-                    $next = $data[0]; 
-                    $nextime = $data[1];
-                    // dapatkan nama dan waktu solat selepas yang skangni
-                    $future = $data3[0]; 
-                    $futuretime = $data3[1];
-
-                    // asingkan jam dan minit untuk waktu solat seterusnya                   
-                    $t     = explode(":", $data[1]);
-                    $nexthour = $t[0];
-                    $nextmin  = $t[1];
-
-                    // asingkan jam dan minit untuk waktu solat selepas yang skangni
-                    $t2     = explode(":", $data3[1]);
-                    $nexthour2 = $t2[0];
-                    $nextmin2  = $t2[1];
-                    endif;
-                endif;      
-
-            endfor;
- // check if custom css enable or disabled;
-   if(get_option('ezws_css_enable') == "Yes"):
-          echo '<style>'. get_option('ezws_custom_css'). '</style>';
-   endif;  
-
-   if($row[2] == "Ahad"):
-        $harijawi = "احد";
-   elseif($row[2] == "Isnin"):
-        $harijawi = "اثنين";
-   elseif($row[2] == "Selasa"):
-        $harijawi = "ثلاث";
-   elseif($row[2] == "Rabu"):
-        $harijawi = "رابو";
-   elseif($row[2] == "Khamis"):
-        $harijawi = "خميس";  
-   elseif($row[2] == "Jumaat"):
-        $harijawi = "جمعة";
-   elseif($row[2] == "Sabtu"):
-        $harijawi = "سبتو";
-   endif;                  
+                  //asingkan jam dan minit untuk subuh esok
+                  $t2     = explode(":", $dataTmr[0]);
+                  $nexthour2 = $t2[0];
+                  $nextmin2  = $t2[1];
+                  // tukar tarikh jadi esok. 
+                  $tdate = explode ("-", $tomorrow);
+                  $tdate2 = explode ("-", $tomorrow);
+                endif;  
+        // kalau dah lebih kul 12 malam...         
+        elseif(date("G:i:s") > "0:00"):
+                // check data adalah Isyak, dan time sekarang belum masuk waktu imsak.
+                if( $time < strtotime($dataTod[0]) ): 
+                  // dapatkan nama ngan waktu isyak semalam
+                  $nowtime = $dataYes[6];  
+                  $now = __('Isha', 'wpwsc');
+                   
+                  // dapatkan nama ngan waktu imsak harini  
+                  // asingkan jam dan minit dari data 
+                  $t     = explode(":", $dataTod[0]);
+                  $nexthour = $t[0];          
+                  $nextmin  = $t[1] - 10;
+                  $nextime  = $nexthour .":". $nextmin ;
+                  $next = __('Imsak', 'wpwsc');
                   
-             
+                  // dapatkan nama ngan waktu subuh harini  
+                  $futuretime = $dataTod[1];
+
+                  // asingkan jam dan minit dari data
+                  $t2     = explode(":", $dataTod[0]);
+                  $nexthour2 = $t2[0];
+                  $nextmin2  = $t2[1];
+
+                  // kekalkan tarikh untuk atas bawah harini. 
+                  $tdate = explode ("-", $today);
+                  $tdate2 = explode ("-", $today);
+                endif;
+
+
+        endif;
+        
+        // Imsak ke Subuh
+        if ($time < strtotime($dataTod[0]) && $time > strtotime($dataTod[0])-600):
+
+            // dapatkan nama dan waktu solat
+            
+            // dapatkan nama dan waktu solat seterusnya
+            $nextime = $dataTod[0];
+            // dapatkan nama dan waktu solat selepas yang skangni
+            $futuretime = $dataTod[1];
+
+            // asingkan jam dan minit untuk waktu solat seterusnya
+            $t     = explode(":", $dataTod[0]);
+            $nexthour = $t[0];
+            $nextmin  = $t[1];
+
+            $nowtime = $nexthour .":". $nextmin - 10;
+            $now = __('Imsak', 'wpwsc');
+
+            // asingkan jam dan minit untuk waktu solat selepas yang skangni
+            $t2     = explode(":", $dataTod[1]);
+            $nexthour2 = $t2[0];
+            $nextmin2  = $t2[1];
+            $next = __('Fajr', 'wpwsc');
+        endif;
+        
+        // Subuh ke Syuruk
+        if ($time < strtotime($dataTod[1]) && $time > strtotime($dataTod[0])):
+
+            // dapatkan nama dan waktu solat
+            $nowtime = $dataTod[0];
+            $now = __('Fajr', 'wpwsc');
+            // dapatkan nama dan waktu solat seterusnya
+            $nextime = $dataTod[1];
+            $next = __('Sunrise', 'wpwsc');
+            // dapatkan nama dan waktu solat selepas yang skangni
+            $futuretime = $dataTod[2];
+
+            // asingkan jam dan minit untuk waktu solat seterusnya
+            $t     = explode(":", $dataTod[1]);
+            $nexthour = $t[0];
+            $nextmin  = $t[1];
+
+            // asingkan jam dan minit untuk waktu solat selepas yang skangni
+            $t2     = explode(":", $dataTod[2]);
+            $nexthour2 = $t2[0];
+            $nextmin2  = $t2[1];
+        endif;
+        
+        // Syuruk ke Zuhur  
+        if ($time < strtotime($dataTod[2]) && $time > strtotime($dataTod[1])):
+
+            // dapatkan nama dan waktu solat
+            $nowtime = $dataTod[1];
+            $now = __('Sunrise', 'wpwsc');
+            // dapatkan nama dan waktu solat seterusnya
+            $nextime = $dataTod[2];
+            $next = __('Dhuhr', 'wpwsc');
+            // dapatkan nama dan waktu solat selepas yang skangni
+            $futuretime = $dataTod[3];
+
+            // asingkan jam dan minit untuk waktu solat seterusnya
+            $t     = explode(":", $dataTod[2]);
+            $nexthour = $t[0];
+            $nextmin  = $t[1];
+
+            // asingkan jam dan minit untuk waktu solat selepas yang skangni
+            $t2     = explode(":", $dataTod[3]);
+            $nexthour2 = $t2[0];
+            $nextmin2  = $t2[1];
+        endif;
+
+        // Zuhur ke Asar  
+        if ($time < strtotime($dataTod[3]) && $time > strtotime($dataTod[2])):
+
+            // dapatkan nama dan waktu solat
+            $nowtime = $dataTod[2];
+            $now = __('Dhuhr', 'wpwsc');
+            // dapatkan nama dan waktu solat seterusnya
+            $nextime = $dataTod[3];
+            $next = __('Asr', 'wpwsc');
+            // dapatkan nama dan waktu solat selepas yang skangni
+            $futuretime = $dataTod[5];
+
+            // asingkan jam dan minit untuk waktu solat seterusnya
+            $t     = explode(":", $dataTod[3]);
+            $nexthour = $t[0];
+            $nextmin  = $t[1];
+
+            // asingkan jam dan minit untuk waktu solat selepas yang skangni
+            $t2     = explode(":", $dataTod[5]);
+            $nexthour2 = $t2[0];
+            $nextmin2  = $t2[1];
+        endif;
+
+        // Asar ke Maghrib  
+        if ($time < strtotime($dataTod[5]) && $time > strtotime($dataTod[3])):
+
+            // dapatkan nama dan waktu solat
+            $nowtime = $dataTod[3];
+            $now = __('Asr', 'wpwsc');
+            // dapatkan nama dan waktu solat seterusnya
+            $nextime = $dataTod[5];
+            $next = __('Maghrib', 'wpwsc');
+            // dapatkan nama dan waktu solat selepas yang skangni
+            $futuretime = $dataTod[6];
+
+            // asingkan jam dan minit untuk waktu solat seterusnya
+            $t     = explode(":", $dataTod[5]);
+            $nexthour = $t[0];
+            $nextmin  = $t[1];
+
+            // asingkan jam dan minit untuk waktu solat selepas yang skangni
+            $t2     = explode(":", $dataTod[6]);
+            $nexthour2 = $t2[0];
+            $nextmin2  = $t2[1];
+        endif;
+
+        // Maghrib ke isyak
+        if ($time < strtotime($dataTod[6]) && $time > strtotime($dataTod[4])):
+            // dapatkan nama dan waktu maghrib harini
+            $nowtime = $dataTod[5];
+            $now = __('Maghrib', 'wpwsc');
+            // dapatkan nama dan waktu isyak harini
+            $nextime = $dataTod[6];
+            $next = __('Isha', 'wpwsc');
+
+            // asingkan jam dan minit untuk waktu isyak harini
+            $t     = explode(":", $dataTod[6]);
+            $nexthour = $t[0];
+            $nextmin  = $t[1];
+
+            
+
+            // asingkan jam dan minit untuk waktu imsak esok
+            $t2     = explode(":", $dataTmr[0]);
+            $nexthour2 = $t2[0];
+            $nextmin2  = $t2[1]+10;
+            // dapatkan nama dan waktu imsak esok
+            $futuretime = $nexthour2 .":".$nextmin2 ;
+
+            // asingkan tarikh untuk next kepada harini, dan future kepada esok
+            $tdate = explode ("-", $today);
+            $tdate2 = explode ("-", $tomorrow);
+        
+        endif;
+$counter = "default";
+if(date('l', $todayTime) == "Sunday"):
+        $harijawi = __('احد', 'wpwsc');
+   elseif(date('l', $todayTime) == "Monday"):
+        $harijawi = __('اثنين', 'wpwsc');
+   elseif(date('l', $todayTime) == "Tuesday"):
+        $harijawi = __('ثلاث', 'wpwsc');
+   elseif(date('l', $todayTime) == "Wednesday"):
+        $harijawi = __('رابو', 'wpwsc');
+   elseif(date('l', $todayTime) == "Thursday"):
+        $harijawi = __('خميس', 'wpwsc');  
+   elseif(date('l', $todayTime) == "Friday"):
+        $harijawi = __('جمعة', 'wpwsc');
+   elseif(date('l', $todayTime) == "Saturday"):
+        $harijawi = __('سبتو', 'wpwsc');
+   endif;
 ?>
 
-
 <div id="wscontainer" <?php if(get_option('ezws_bg_enable') == "Yes"): echo 'style="background-repeat: '.get_option('ezws_bg_repeat').';  background-image: url('.get_option('ezws_bg_image').');"';
-                            elseif(get_option('ezws_bg_scheme')!= "" && get_option('ezws_bg_enable') == "No"): echo 'style="background-color:'.get_option('ezws_bg_scheme').'"'; endif; 
+                            elseif(get_option('ezws_bg_scheme')!= "" && get_option('ezws_bg_enable') == "No"): echo 'style="background-color:'.get_option('ezws_bg_scheme').'"'; 
+                            endif; 
                       ?> >
                 <div class="info_message" id="ezws_main" <?php if(get_option('ezws_textalign')!= ""): echo 'style="text-align:'.get_option('ezws_textalign').'"'; endif; ?>>
                     
                     <span style="font-size: 20px"><?php echo $harijawi; ?></span><br />
-                    <?php if(get_option('ezws_greg_enable') == "Yes"): ?>
-                    <?php echo $row[1]; ?> <br />
-                    <?php endif; ?>
-                    <?php if(get_option('ezws_hijri_enable') == "Yes"): ?>
                     <?php echo $hijri; ?> <br />
-                    <?php endif; ?>
-                    <?php echo ucfirst(strtolower($namaKawasan['Nama']));  ?> <br />
-                    <span id="waktusolat">
-                    Now : <?=$now?> (<?=$nowtime?>) <br />
-                    Next : <?=$next?> (<?=$nextime?>) <br /></span>
+                     <span id="waktusolat">
+                    <?php echo __('Now','wpwsc'); ?> : <?=$now?> (<?=$nowtime?>) <br />
+                    <?php echo __('Next','wpwsc'); ?> : <?=$next?> (<?=$nextime?>) <br /></span>
                   </div>
-                <div class="info_message" id="complete_info_message" style="display: none; ">
-                    Telah Masuk Waktu <?php echo $next; ?> Bagi Kawasan <?php echo $row["Negeri"]; ?>
-                </div>  
+                <div id="countbox"></div>
                 <!-- Countdown dashboard start -->
-                <div id="countdown_dashboard">
-                  <div class="dash hours_dash">
-                    <span class="dash_title">jam</span>
-                    <div class="digit">0</div>
-                    <div class="digit">0</div>
-                  </div>
-
-                  <div class="dash minutes_dash">
-                    <span class="dash_title">minit</span>
-                    <div class="digit">0</div>
-                    <div class="digit">0</div>
-                  </div>
-
-                  <div class="dash seconds_dash">
-                    <span class="dash_title">saat</span>
-                    <div class="digit">0</div>
-                    <div class="digit">0</div>
-                  </div>
                   <div class="info_message">
-                      <a href="#ezws_main" id="hideDiv">Tukar Kawasan </a> 
+                      <a href="#ezws_main" id="hideDiv"><?php echo __('Change location', 'wpwsc'); ?> </a> 
                   </div>
                   <div class="info_message" id="ezwssetting" style="display: none; ">
-                    <?php ezws_locator(); ?>
-                    <a href="#ezws_main" id="showDiv">batal </a> 
+                    <button id="waktuSolatGetLocation" onclick="getLocation();" ><?php echo __('Get Location', 'wpwsc'); ?></button>
+                    <button id="waktuSolatClearLocation" onclick="clearLocation();" ><?php echo __('Clear Location', 'wpwsc'); ?></button>
+                    <button id="showDiv"><?php echo __('Cancel', 'wpwsc'); ?></button> 
                   </div>
                   <?php if(get_option('ezws_credit') == "Yes"): ?>
                   <div class="info_message" >
-                    <a href="http://denaihati.com/projek-waktu-solat" ><img src="<?php echo plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ) ."/images/dome-th.png"; ?>" width="60" height="22" alt="Projek Waktu Solat" /></a> 
+                    <a href="http://denaihati.com/projek-waktu-solat" ><img src="<?php echo plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ) ."/images/dome-th.png"; ?>" width="60" height="22" alt="<?php echo __('Projek Waktu Solat', 'wpwsc'); ?>" /></a> 
                   </div>    
                   <?php endif;  ?>
-                </div>
                 <!-- Countdown dashboard end -->
                 <script language="javascript" type="text/javascript">
-                  var ez = jQuery.noConflict();
+                //geolocator
+                    function showLocation(position) {
+                      var latitude = position.coords.latitude;
+                      var longitude = position.coords.longitude;
+                      jQuery.cookie('latitude', latitude, { expires: 7, path: '/' });
+                      jQuery.cookie('longitude', longitude, { expires: 7, path: '/' });
 
+                      var answer = confirm("<?php echo __('Use this location?', 'wpwsc'); ?> <?php echo __('Latitude', 'wpwsc'); ?> : " + latitude + " <?php echo __('Longitude', 'wpwsc'); ?> : " + longitude);
+                      if (answer){
+                        window.location.reload(true);
+                      }
+                    }
+
+                    function errorHandler(err) {
+                      if(err.code == 1) {
+                        alert("<?php echo __('Error: Access is denied!', 'wpwsc'); ?>");
+                      }else if( err.code == 2) {
+                        alert("<?php echo __('Error: Position is unavailable!', 'wpwsc'); ?>");
+                      }
+                    }
+                    function getLocation(){
+
+                       if(navigator.geolocation){
+                          // timeout at 60000 milliseconds (60 seconds)
+                          var options = {timeout:60000};
+                          navigator.geolocation.getCurrentPosition(showLocation, 
+                                                                   errorHandler,
+                                                                   options);
+                       }else{
+                          alert("<?php echo __('Sorry, browser does not support geolocation!', 'wpwsc'); ?>");
+                       }
+                    }
+
+                    function clearLocation(){
+
+                      jQuery.cookie('latitude', "", { expires: 7, path: '/' });
+                      jQuery.cookie('longitude', "", { expires: 7, path: '/' });
+
+                      var answer = confirm("<?php echo __('Clear location?', 'wpwsc'); ?>");
+                      if (answer){
+                        window.location.reload(true);
+                      }
+                    }
+
+                    
+                  
                   jQuery(document).ready(function(ez) {
-                    // start countdown
-                    ez('#countdown_dashboard').countDown({
-                      targetDate: {
-                        'day':    <?php echo $tdate[0] ?>,
-                        'month':  <?php echo $tdate[1] ?>,
-                        'year':   <?php echo $tdate[2] ?>,
-                        'hour':   <?php echo $nexthour; ?>,
-                        'min':    <?php echo $nextmin; ?>,
-                        'sec':    0
-                      },
-                      onComplete: function() { 
-                          ez('#countdown_dashboard').stopCountDown();  
-                          ez('#waktusolat').html("Now : <?=$next?> (<?=$nextime?>) <br />Next : <?=$future?> (<?=$futuretime?>) <br />");
-                          ez('#complete_info_message').slideDown();
-                           // $('#countdown_dashboard').fadeOut();
-                          setTimeout(function() {
-                            ez('#complete_info_message').fadeOut("slow");
-                          }, 10000);  
-                        <?php if(get_option('ezws_auto_refresh') == "Yes"): ?>
-                          setTimeout(function() {
-                              location.reload();
-                          }, 60000); 
-                         <?php endif; ?> 
-                          
-                          ez('#countdown_dashboard').setCountDown({
-                            targetDate: {
-                              'day':    <?php echo $tdate2[0] ?>,
-                              'month':  <?php echo $tdate2[1] ?>,
-                              'year':   <?php echo $tdate2[2] ?>,
-                              'hour':   <?php echo $nexthour2; ?>,
-                              'min':    <?php echo $nextmin2; ?>,
-                              'sec':    0
-                            }
-                          });       
-                          ez('#countdown_dashboard').startCountDown();  
+                  
 
-                           }
-                    });
-
-                  // selection untuk kod kawasan  
-                  ez("#kodKawasan").change(function() { 
-                          ez.cookie('kodKawasan', ez("#kodKawasan").val(), { expires: 7, path: '/' });
-                          setTimeout(function() {
-                              location.reload();
-                          }, 500); 
-
-                  });  
                   // show hide div tukar kawasan
                   ez("a#hideDiv").click(function(){
                     ez('div#ezwssetting').show('slow');
                     ez("#hideDiv").hide('slow');
                   });
-                  ez("a#showDiv").click(function(){
+                  ez("#showDiv").click(function(){
                     ez('div#ezwssetting').hide('fast');
                     ez("#hideDiv").show('fast');
                   });
-                    
+
+                                    
                   });
+
+                  // counter baru
+                  (function() {
+                    $(document).ready(function() {GetCounter();});
+
+                    function GetCounter() { 
+                      var  dateFuture = new Date(<?php echo $tdate[2] ?>,<?php echo $tdate[1] ?>,<?php echo $tdate[0] ?>,<?php echo $nexthour; ?>,<?php echo $nextmin; ?>,0);
+                        var dateNow = new Date();                                                            
+                        var amount = dateFuture.getTime() - dateNow.getTime();               
+                        delete dateNow;
+                        /* time is already past */
+                        if(amount < 0){
+                                out=  "Refreshing countdown in <br />" + 
+                                      "<div id='hours'><span></span>0<div id='hours_text'></div></div>" + 
+                                      "<div id='mins'><span></span>0<div id='mins_text'></div></div>" + 
+                                      "<div id='secs'><span></span>10<div id='secs_text'></div></div>" ;
+                                document.getElementById('countbox').innerHTML=out;    
+                                location.reload();
+                        }
+                        /* date is still good */
+                        else{
+                                days=0;hours=0;mins=0;secs=0;out="";
+                                amount = Math.floor(amount/1000); /* kill the milliseconds */
+                                days=Math.floor(amount/86400); /* days */
+                                amount=amount%86400;
+                                hours=Math.floor(amount/3600); /* hours */
+                                amount=amount%3600;
+                                mins=Math.floor(amount/60); /* minutes */
+                                amount=amount%60;
+                                secs=Math.floor(amount); /* seconds */
+                                out=  "<div id='hours'><span></span><dl>" + ('0' + hours).slice(-2) +"</dl><div id='hours_text'><?php echo __('Hour', 'wpwsc'); ?></div></div>" + 
+                                      "<div id='mins'><span></span><dl>" +('0' + mins).slice(-2)  +"</dl><div id='mins_text'><?php echo __('Minute', 'wpwsc'); ?></div></div>" + 
+                                      "<div id='secs'><span></span><dl>" + ('0' + secs).slice(-2) +"</dl><div id='secs_text'><?php echo __('Second', 'wpwsc'); ?></div></div>" ;
+                                document.getElementById('countbox').innerHTML=out;
+                        }
+                      setTimeout(GetCounter, 1000);     }
+                    }
+                  )();  
+                  
                 </script>
      </div>  
 <?php     
 }
-
-function ezws_locator(){
-        global $wpdb;
-        $title = esc_attr($instance['title']);
-        $tableKod = $wpdb->prefix."waktusolatkod2";  
-        $kawasan = $wpdb->get_results("SELECT * FROM {$tableKod}",OBJECT);
-        ?>
-         <p>
-          <label for="kodKawasan"><?php _e('Kawasan:'); ?></label> 
-          <select id="kodKawasan" name="kodKawasan" class="widefat" style="width:100%;">
-          <?php foreach ($kawasan as $data): ?>
-            <option value="<?php echo $data->Kod; ?>" <?php if ( $data->Kod == $_COOKIE["kodKawasan"] ) echo 'selected="selected"'; ?>><?php echo ucfirst(strtolower($data->Nama)); ?></option>
-              <?php endforeach; ?>
-          </select>
-        </p>
-<?php
-}     
 
 
 // Waktu Solat Options Panel
@@ -448,62 +824,62 @@ $ezwsoptions = array (
                     "type" => "section"),
                   array( "type" => "open"),
 
-                  array( "name" => "Show Hijri date?",
-                    "desc" => "Select if you want to show hijri date",
+                  array( "name" => __('Show Hijri date?','wpwsc'),
+                    "desc" => __('Select if you want to show hijri date','wpwsc'),
                     "id" => $shortname."_hijri_enable",
                     "type" => "select",
-                    "options" => array("Yes", "No"),
+                    "options" => array(__('Yes','wpwsc'), __('No','wpwsc')),
                     "std" => "Yes"),
                   
-                  array( "name" => "Show Gregorian date?",
-                    "desc" => "Select if you want to show Gregorian date",
+                  array( "name" => __('Show Gregorian date?','wpwsc'),
+                    "desc" => __('Select if you want to show Gregorian date','wpwsc'),
                     "id" => $shortname."_greg_enable",
                     "type" => "select",
-                    "options" => array("No", "Yes"),
+                    "options" => array(__('No','wpwsc'), __('Yes','wpwsc')),
                     "std" => "No"),  
                   
-                  array( "name" => "Text Align",
-                    "desc" => "Choose text align",
+                  array( "name" => __('Text Align','wpwsc'),
+                    "desc" => __('Choose text align','wpwsc'),
                     "id" => $shortname."_textalign",
                     "type" => "select",
                     "options" => array("center", "right", "left"),
                     "std" => "center"),  
                   
-                  array( "name" => "Colour Scheme",
-                    "desc" => "Select the colour scheme for the counter",
+                  array( "name" => __('Colour Scheme','wpwsc'),
+                    "desc" => __( 'Select the colour scheme for the counter', 'wpwsc' ),
                     "id" => $shortname."_color_scheme",
                     "type" => "select",
-                    "options" => array("default", "blue", "red", "green", "black"),
-                    "std" => "default"),
+                    "options" => array("default" , "green", "red", "purple", "black", "blue"),
+                    "std" => "default" ),
 
 
-                  array( "name" => "Background Color",
-                    "desc" => "Enter a custom background color",
+                  array( "name" => __('Background Color','wpwsc'),
+                    "desc" => __('Enter a custom background color','wpwsc'),
                     "id" => $shortname."_bg_scheme",
                     "type" => "colorpicker",
                     "std" => "#FFF"),  
                   
                     
 
-                  array( "name" => "Custom Background Image",
+                  array( "name" => __('Custom Background Image','wpwsc'),
                     "type" => "subheader"),
                   array( "type" => "open"),  
 
-                  array( "name" => "Enable background image?",
-                    "desc" => "Select if you want to enable custom background image",
+                  array( "name" => __('Enable background image?','wpwsc'),
+                    "desc" => __('Select if you want to enable custom background image','wpwsc'),
                     "id" => $shortname."_bg_enable",
                     "type" => "select",
-                    "options" => array("No", "Yes"),
+                    "options" => array(__('No','wpwsc'), __('Yes','wpwsc')),
                     "std" => "No"), 
 
-                  array( "name" => "Background image upload",  
-                    "desc" => "Use this option if you want to use custom background image",  
+                  array( "name" => __('Background image upload','wpwsc'),  
+                    "desc" => __('Use this option if you want to use custom background image','wpwsc'),  
                     "id" => $shortname."_bg_image",  
                     "type" => "upload",  
                     "std" => ""),   
                   
-                  array( "name" => "Background Repeat?",
-                    "desc" => "Choose if you want your background repeat properties",
+                  array( "name" => __('Background Repeat?','wpwsc'),
+                    "desc" => __('Choose if you want your background repeat properties','wpwsc'),
                     "id" => $shortname."_bg_repeat",
                     "type" => "select",
                     "options" => array("no-repeat", "repeat", "repeat-x", "repeat-y"),
@@ -513,15 +889,15 @@ $ezwsoptions = array (
                     "type" => "subheader"),
                   array( "type" => "open"),  
 
-                  array( "name" => "Enable custom css?",
-                    "desc" => "Select if you want to enable custom css",
+                  array( "name" => __('Enable custom css?','wpwsc'),
+                    "desc" => __('Select if you want to enable custom css','wpwsc'),
                     "id" => $shortname."_css_enable",
                     "type" => "select",
-                    "options" => array("No", "Yes"),
+                    "options" => array(__('No','wpwsc'), __('Yes','wpwsc')),
                     "std" => "No"),  
 
-                  array( "name" => "Custom CSS",
-                    "desc" => "Want to add any custom CSS code? Put in here, and the rest is taken care of. This overrides any other stylesheets. eg: a.button{color:green}",
+                  array( "name" => __('Custom CSS','wpwsc'),
+                    "desc" => __('Want to add any custom CSS code? Put in here, and the rest is taken care of. This overrides any other stylesheets. eg: a.button{color:green}','wpwsc'),
                     "id" => $shortname."_custom_css",
                     "type" => "textarea",
                     "std" => "#wscontainer {
@@ -583,17 +959,17 @@ $ezwsoptions = array (
                     font-weight: bold;
                     text-align: center;
                   }"),   
-                  array( "name" => "Show plugin credit?",
-                    "desc" => "Select if you want to enable plugin credit at the bottom of widget",
+                  array( "name" => __( 'Show plugin credit?', 'wpwsc'),
+                    "desc" => __( 'Select if you want to enable plugin credit at the bottom of widget', 'wpwsc'),
                     "id" => $shortname."_credit",
                     "type" => "select",
-                    "options" => array("No", "Yes"),
+                    "options" => array(__( 'No', 'wpwsc'), __( 'Yes', 'wpwsc')),
                     "std" => "Yes"),
-                  array( "name" => "Enable auto refresh?",
-                    "desc" => "Select if you want to enable auto refresh",
+                  array( "name" => __('Enable auto refresh?', 'wpwsc'),
+                    "desc" => __( 'Select if you want to enable auto refresh', 'wpwsc'),
                     "id" => $shortname."_auto_refresh",
                     "type" => "select",
-                    "options" => array("No", "Yes"),
+                    "options" => array(__( 'No', 'wpwsc'), __( 'Yes', 'wpwsc')),
                     "std" => "No"),   
 
                   array( "type" => "close")
@@ -640,24 +1016,25 @@ function waktusolat_admin() {
       if ( $_REQUEST['saved'] ) echo '
       <div id="message" class="updated fade">
         <p>
-          <strong>Waktu Solat settings saved.</strong>
+          <strong>'. __('Waktu Solat settings saved.','wpwsc').'</strong>
         </p>
       </div>';
+
       if ( $_REQUEST['reset'] ) echo '
       <div id="message" class="updated fade">
         <p>
-          <strong>Waktu Solat settings reset.</strong>
+          <strong>'. __('Waktu Solat settings reset.','wpwsc').'</strong>
         </p>
       </div>';
       
-      ?>
+      echo '   
       <div class="wrap ezws_wrap">
-        <h2>Waktu Solat Settings</h2>
+        <h2>'. __('Waktu Solat Settings','wpwsc').' </h2>
       
         <div class="ezws_opts">
-          <form method="post">
+          <form method="post">';
       
-            <?php foreach ($ezwsoptions as $value) {
+      foreach ($ezwsoptions as $value) {
       switch ( $value['type'] ) {
       
       case "open":
@@ -675,7 +1052,7 @@ function waktusolat_admin() {
       
       case "title":
       ?>
-      <p>Please use the options page below to edit the widget settings.</p>
+      <p><?php echo __('Please use the options page below to edit the widget settings.','wpwsc'); ?></p>
       
       <?php break;
       
@@ -684,12 +1061,12 @@ function waktusolat_admin() {
       
       <div class="ezws_input ezws_text">
         <label for="<?php echo $value['id']; ?>">
-          <?php echo $value['name'];
+          <?php echo __($value['name'], 'wpwsc');
           ?>
         </label>
         <input name="<?php echo $value['id']; ?>" id="<?php echo $value['id']; ?>" type="<?php echo $value['type']; ?>" value="<?php if ( get_settings( $value['id'] ) != "") { echo stripslashes(get_settings( $value['id'])  ); } else { echo $value['std']; } ?>" />
         <small>
-          <?php echo $value['desc'];
+          <?php echo __($value['desc'], 'wpwsc');
           ?>
         </small>
         <div class="clearfix">
@@ -704,12 +1081,12 @@ function waktusolat_admin() {
       
       <div class="ezws_input ezws_text">
         <label for="<?php echo $value['id']; ?>">
-          <?php echo $value['name'];
+          <?php echo __($value['name'], 'wpwsc');
           ?>
         </label>
         <input name="<?php echo $value['id']; ?>" id="color_<?php echo $value['id']; ?>" type="<?php echo $value['type']; ?>" value="<?php if ( get_settings( $value['id'] ) != "") { echo stripslashes(get_settings( $value['id'])  ); } else { echo $value['std']; } ?>" />
         <small>
-          <?php echo $value['desc'];
+          <?php echo __($value['desc'], 'wpwsc');
           ?>
         </small>
         <div id="color_picker_<?php echo $value['id']; ?>" style="display:hidden"></div>
@@ -732,12 +1109,11 @@ function waktusolat_admin() {
       
       <div class="ezws_input ezws_textarea">
         <label for="<?php echo $value['id']; ?>">
-          <?php echo $value['name'];
-          ?>
+          <?php echo __($value['name'], 'wpwsc'); ?>
         </label>
         <textarea name="<?php echo $value['id']; ?>" type="<?php echo $value['type']; ?>" cols="" rows=""><?php if ( get_settings( $value['id'] ) != "") { echo trim(get_settings( $value['id'])); } else { echo trim($value['std']); } ?></textarea>
         <small>
-          <?php echo $value['desc'];
+          <?php echo __($value['desc'], 'wpwsc');
           ?>
         </small>
         <div class="clearfix">
@@ -753,7 +1129,7 @@ function waktusolat_admin() {
       
       <div class="ezws_input ezws_select">
         <label for="<?php echo $value['id']; ?>">
-          <?php echo $value['name'];
+          <?php echo __($value['name'], 'wpwsc');
           ?>
         </label>
       
@@ -761,14 +1137,14 @@ function waktusolat_admin() {
           <?php foreach ($value['options'] as $option) {
           ?>
           <option <?php if (get_settings( $value['id'] ) == $option) { echo 'selected="selected"'; } ?>
-            ><?php echo $option;
+            ><?php echo __($option, 'wpwsc');
             ?>
           </option><?php }
           ?>
         </select>
       
         <small>
-          <?php echo $value['desc'];
+          <?php echo __($value['desc'], 'wpwsc');
           ?>
         </small>
         <div class="clearfix">
@@ -782,7 +1158,7 @@ function waktusolat_admin() {
       
       <div class="ezws_input ezws_checkbox">
         <label for="<?php echo $value['id']; ?>">
-          <?php echo $value['name'];
+          <?php echo __($value['name'], 'wpwsc');
           ?>
         </label>
       
@@ -792,7 +1168,7 @@ function waktusolat_admin() {
         />
       
         <small>
-          <?php echo $value['desc'];
+          <?php echo __($value['desc'], 'wpwsc');
           ?>
         </small>
         <div class="clearfix">
@@ -808,11 +1184,11 @@ function waktusolat_admin() {
 
        <div class="ezws_input ezws_upload">
 
-        <label for="<?php echo $value['id']; ?>"><?php echo $value['name']; ?></label>  
+        <label for="<?php echo $value['id']; ?>"><?php echo __($value['name'], 'wpwsc'); ?></label>  
         <input id="<?php echo $value['id'] ?>_image" type="text" size="36" name="<?php echo $value['id'] ?>" value="<?php if ( get_settings( $value['id'] ) != "") { echo trim(get_settings( $value['id'])); } else { echo trim($value['std']); } ?>" />
-        <input id="<?php echo $value['id'] ?>_button" type="button" value="Upload Image" />
+        <input id="<?php echo $value['id'] ?>_button" type="button" value="<?php echo __('Upload Image', 'wpwsc'); ?>" />
 
-        <small><?php echo $value['desc']; ?></small><div class="clearfix"></div>  
+        <small><?php echo __($value['desc'], 'wpwsc'); ?></small><div class="clearfix"></div>  
 
       </div>
       <script language="javascript" type="text/javascript">
@@ -841,7 +1217,7 @@ function waktusolat_admin() {
       
       ?>
       <div class="ezws_title">
-    <h3><img src="<?php echo plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ) ."/images/dome-th.png"; ?>" width="60" height="22" alt="Projek Waktu Solat" /><?php echo $value['name']; ?></h3><span class="submit"><input name="save<?php echo $i; ?>" type="submit" value="Save changes" />
+    <h3><img src="<?php echo plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ) ."/images/dome-th.png"; ?>" width="60" height="22" alt="Projek Waktu Solat" /><?php echo __($value['name'], 'wpwsc'); ?></h3><span class="submit"><input name="save<?php echo $i; ?>" type="submit" value="<?php echo __('Save changes', 'wpwsc'); ?>" />
     </span><div class="clearfix"></div>
         </div>
 
@@ -854,7 +1230,7 @@ function waktusolat_admin() {
       ?>
 <div class="ezws_section">
   <div class="ezws_title">
-    <h3><img src="<?php echo plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ) ."/images/dome-th.png"; ?>" width="60" height="22" alt="Projek Waktu Solat" /><?php echo $value['name']; ?></h3><span class="submit"><input name="save<?php echo $i; ?>" type="submit" value="Save changes" />
+    <h3><img src="<?php echo plugins_url ( plugin_basename ( dirname ( __FILE__ ) ) ) ."/images/dome-th.png"; ?>" width="60" height="22" alt="Projek Waktu Solat" /><?php echo __($value['name'], 'wpwsc'); ?></h3><span class="submit"><input name="save<?php echo $i; ?>" type="submit" value="<?php echo __('Save changes', 'wpwsc'); ?>" />
     </span><div class="clearfix"></div></div>
     <div class="ezws_options">
 
@@ -868,7 +1244,7 @@ function waktusolat_admin() {
     </form>
     <form method="post">
       <p class="submit">
-        <input name="reset" type="submit" value="Reset" />
+        <input name="reset" type="submit" value="<?php echo __('Reset', 'wpwsc'); ?>" />
         <input type="hidden" name="action" value="reset" />
       </p>
     </form>

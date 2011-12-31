@@ -29,7 +29,7 @@
 #days, #hours, #mins, #secs{
 	float: left;
 	text-align: center;	
-	background-image:url('../images/flip_blue.png');
+	background-image:url('../images/flip_purple.png');
 	background-repeat:no-repeat;
 	margin: 0 7px;
 	height: 44px;
@@ -50,7 +50,7 @@
 }
 
 #days span, #hours span, #mins span , #secs span {
-	background: url('../images/flip_gradient_blue.png');
+	background: url('../images/flip_gradient_purple.png');
 	background-repeat:no-repeat;
 	position: absolute;
 	display: block;

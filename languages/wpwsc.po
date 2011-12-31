@@ -1,0 +1,355 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Text in function
+#: waktusolat.php:66
+msgid "Asr"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Background Color"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Background Repeat?"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Background image upload"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:531
+msgid "Cancel"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:526
+msgid "Change location"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Choose if you want your background repeat properties"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Choose text align"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:530
+msgid "Clear Location"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:578
+msgid "Clear location?"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Colour Scheme"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Custom Background Image"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Custom CSS"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "Dhuhr"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Enable auto refresh?"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Enable background image?"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Enable custom css?"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Enter a custom background color"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:555
+msgid "Error: Access is denied!"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:557
+msgid "Error: Position is unavailable!"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "Fajr"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:529
+msgid "Get Location"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:631
+msgid "Hour"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "Imsak"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "Isha"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+#: waktusolat.php:547
+msgid "Latitude"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+#: waktusolat.php:547
+msgid "Longitude"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "Maghrib"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:632
+msgid "Minute"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:521
+msgid "Next"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "No"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:520
+msgid "Now"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:888
+msgid "Please use the options page below to edit the widget settings."
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:535
+msgid "Projek Waktu Solat"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:1080
+msgid "Reset"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:1066
+msgid "Save changes"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:633
+msgid "Second"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Select if you want to enable auto refresh"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Select if you want to enable custom background image"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Select if you want to enable custom css"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Select if you want to enable plugin credit at the bottom of widget"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Select if you want to show Gregorian date"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Select if you want to show hijri date"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Select the colour scheme for the counter"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Show Gregorian date?"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Show Hijri date?"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Show plugin credit?"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:569
+msgid "Sorry, browser does not support geolocation!"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "Sunrise"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Text Align"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "Timezone"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "Title"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:1022
+msgid "Upload Image"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:547
+msgid "Use this location?"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Use this option if you want to use custom background image"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Waktu Solat Settings"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Waktu Solat settings reset."
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Waktu Solat settings saved."
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Want to add any custom CSS code? Put in here, and the rest is taken care of. This overrides any other stylesheets. eg: a.button{color:green}"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:642
+msgid "Yes"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:1004
+#: waktusolat.php:1024
+msgid "desc"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:994
+#: waktusolat.php:945
+#: waktusolat.php:1020
+#: waktusolat.php:1066
+msgid "name"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "اثنين"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "احد"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "ثلاث"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "جمعة"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "خميس"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "رابو"
+msgstr ""
+
+#. Text in function
+#: waktusolat.php:66
+msgid "سبتو"
+msgstr ""
