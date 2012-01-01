@@ -4,7 +4,7 @@
 Plugin Name: Waktu Solat Countdown
 Plugin URI: http://denaihati.com/projek-waktu-solat
 Description: Prayer Time Plugin with countdown, a collaboration project with <a href="http://denaihati.com/projek-waktu-solat">Denaihati Network</a>.
-Version: 2.0
+Version: 2.0.1
 Author: Mohd Hadihaizil Din
 Author URI: http://www.eizil.com
 License: GPL2
@@ -467,10 +467,14 @@ function waktuSolatMain($lat, $long, $timezone, $calc){
                   //asingkan jam dan minit untuk imsak esok
                   $t     = explode(":", $dataTmr[0]);
                   $nexthour = $t[0];
-                  $nextmin  = $t[1]-10;
+                  $nextmin  = $t[1];
                   $next = __('Imsak', 'wpwsc');
                   // dapatkan nama ngan waktu imsak esok
-                  $nextime = $nexthour.":".$nextmin ;
+                  if($nextmin > 10):
+                      $nextime = $nexthour .":". $nextmin - 10;
+                  else:
+                      $nextime = ($nexthour - 1) .":". ($nextmin + 50);    
+                  endif;
 
                   //asingkan jam dan minit untuk subuh esok
                   $t2     = explode(":", $dataTmr[0]);
@@ -492,8 +496,12 @@ function waktuSolatMain($lat, $long, $timezone, $calc){
                   // asingkan jam dan minit dari data 
                   $t     = explode(":", $dataTod[0]);
                   $nexthour = $t[0];          
-                  $nextmin  = $t[1] - 10;
-                  $nextime  = $nexthour .":". $nextmin ;
+                  $nextmin  = $t[1];
+                  if($nextmin > 10):
+                      $nextime = $nexthour .":". $nextmin - 10;
+                  else:
+                      $nextime = ($nexthour - 1) .":". ($nextmin + 50);    
+                  endif;
                   $next = __('Imsak', 'wpwsc');
                   
                   // dapatkan nama ngan waktu subuh harini  
@@ -526,8 +534,11 @@ function waktuSolatMain($lat, $long, $timezone, $calc){
             $t     = explode(":", $dataTod[0]);
             $nexthour = $t[0];
             $nextmin  = $t[1];
-
-            $nowtime = $nexthour .":". $nextmin - 10;
+            if($nextmin > 10):
+              $nowtime = $nexthour .":". $nextmin - 10;
+            else:
+              $nowtime = ($nexthour - 1) .":". ($nextmin + 50);    
+            endif;
             $now = __('Imsak', 'wpwsc');
 
             // asingkan jam dan minit untuk waktu solat selepas yang skangni
