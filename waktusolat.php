@@ -4,7 +4,7 @@
 Plugin Name: Waktu Solat Countdown
 Plugin URI: http://denaihati.com/projek-waktu-solat
 Description: Prayer Time Plugin with countdown, a collaboration project with <a href="http://denaihati.com/projek-waktu-solat">Denaihati Network</a>.
-Version: 2.0.1
+Version: 2.0.2
 Author: Mohd Hadihaizil Din
 Author URI: http://www.eizil.com
 License: GPL2
@@ -912,64 +912,67 @@ $ezwsoptions = array (
                     "id" => $shortname."_custom_css",
                     "type" => "textarea",
                     "std" => "#wscontainer {
-                    padding: 10px;  
-                    width: 100%;
-                    min-height: 130px;
-                  }
+    padding: 10px;  
+    width: 100%;
+    min-height: 130px;
+}
 
-                  #countdown_dashboard {
-                    width: 140px;
-                    margin: 10px auto;
-                  }
+.info_message{
+    padding-top:10px;
+    padding-left: 5px;
+    width: 100%;
+    font-size: 8pt;
+    font-weight: bold;
+    text-align: center;
+}
 
-                  .dash {
-                    width: 35px;
-                    height: 45px;
-                    background: transparent url('../images/dash.png') 0 0 no-repeat;
-                    float: left;
-                    margin-left: 8px;
-                    position: relative;
-                  }
 
-                  .dash .digit {
-                    font-size: 16pt;
-                    font-weight: bold;
-                    float: left;
-                    width: 17px;
-                    text-align: center;
-                    font-family: Times;
-                    color: #555;
-                    position: relative;
-                  }
+#countbox{
+    padding-top: 20px;
+    color: #fff;
+    font-family: Myriad Pro,Helvetica,sans-serif;
+    font-size: 32px;
+    width: 80%;
+    height: 55px;
+    margin-left:auto;
+    margin-right: auto;
+}
 
-                  .dash_title {
-                    position: absolute;
-                    display: block;
-                    bottom: 0px;
-                    right: 0px;
-                    font-size: 8pt;
-                    font-weight: bold;
-                    color: #555;
-                    text-transform: uppercase;
-                  }
+#days, #hours, #mins, #secs{
+    float: left;
+    text-align: center; 
+    background-image:url('../images/flip_default.png');
+    background-repeat:no-repeat;
+    margin: -20px 7px 0 7px;
+    height: 44px;
+    width: 47px;
+    z-index:1;
+}
 
-                  #loading {
-                    text-align: center;
-                    margin: 10px;
-                    display: none;
-                    position: absolute;
-                    width: 100%;
-                    top: 60px;
-                  }
+#days_text,#hours_text, #mins_text,#secs_text{
+    position: absolute;
+    height: 20px;
+    width: 47px;
+    color: #000;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-top: -20px;
+}
+    
+#days span, #hours span, #mins span , #secs span {
+    background: url(../images/flip_gradient_default.png);
+    background-repeat:no-repeat;
+    position: absolute;
+    display: block;
+    height: 28px;
+    width: 47px;
+}
 
-                  .info_message{
-                    padding-top:10px;
-                    padding-left: 5px;
-                    width: 100%;
-                    font-size: 8pt;
-                    font-weight: bold;
-                    text-align: center;
-                  }"),   
+#days dl, #hours dl, #mins dl , #secs dl {
+    margin-top: 0px;
+}
+
+"),   
                   array( "name" => __( 'Show plugin credit?', 'wpwsc'),
                     "desc" => __( 'Select if you want to enable plugin credit at the bottom of widget', 'wpwsc'),
                     "id" => $shortname."_credit",
