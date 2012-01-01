@@ -1,0 +1,63 @@
+#wscontainer {
+	padding: 10px;	
+	width: 100%;
+	min-height: 130px;
+}
+
+.info_message{
+	padding-top:10px;
+	padding-left: 5px;
+	width: 100%;
+	font-size: 8pt;
+	font-weight: bold;
+	text-align: center;
+}
+
+/* -------------- BEGIN COUNTER ---------------------*/
+
+#countbox{
+	padding-top: 20px;
+	color: #fff;
+	font-family: Myriad Pro,Helvetica,sans-serif;
+	font-size: 32px;
+	width: 80%;
+	height: 55px;
+	margin-left:auto;
+	margin-right: auto;
+}
+
+#days, #hours, #mins, #secs{
+	float: left;
+	text-align: center;	
+	background-image:url('../images/flip_red.png');
+	background-repeat:no-repeat;
+	margin: -20px 7px 0 7px;
+	height: 44px;
+	width: 47px;
+	z-index:1;
+}
+
+#days_text,#hours_text, #mins_text,#secs_text{
+	position: absolute;
+	height: 20px;
+	width: 47px;
+	color: #000;
+	font-size: 12px;
+	text-transform: uppercase;
+	margin-top: -20px;
+}
+	
+#days span, #hours span, #mins span , #secs span {
+	background: url(../images/flip_gradient_red.png);
+	background-repeat:no-repeat;
+	position: absolute;
+	display: block;
+	height: 28px;
+	width: 47px;
+}
+
+#days dl, #hours dl, #mins dl , #secs dl {
+	margin-top: 0px;
+}
+
+/* -------------- END COUNTER ---------------------*/
