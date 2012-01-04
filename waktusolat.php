@@ -4,7 +4,7 @@
 Plugin Name: Waktu Solat Countdown
 Plugin URI: http://denaihati.com/projek-waktu-solat
 Description: Prayer Time Plugin with countdown, a collaboration project with <a href="http://denaihati.com/projek-waktu-solat">Denaihati Network</a>.
-Version: 2.0.2
+Version: 2.0.3
 Author: Mohd Hadihaizil Din
 Author URI: http://www.eizil.com
 License: GPL2
@@ -271,7 +271,7 @@ function waktuSolatMethod() {
        else:
             $color = "default";
        endif;     
-       wp_register_style('waktusolat', plugins_url('/style/main_'.$color.'.css', __FILE__), false, 'All'); 
+       wp_register_style('waktusolat', plugins_url('/style/main_'.$color.'.css', __FILE__), false, '2.0.3'); 
        wp_enqueue_style('waktusolat');
 
 }    
@@ -471,7 +471,7 @@ function waktuSolatMain($lat, $long, $timezone, $calc){
                   $next = __('Imsak', 'wpwsc');
                   // dapatkan nama ngan waktu imsak esok
                   if($nextmin > 10):
-                      $nextime = $nexthour .":". $nextmin - 10;
+                      $nextime = $nexthour .":". ($nextmin - 10);
                   else:
                       $nextime = ($nexthour - 1) .":". ($nextmin + 50);    
                   endif;
@@ -498,7 +498,7 @@ function waktuSolatMain($lat, $long, $timezone, $calc){
                   $nexthour = $t[0];          
                   $nextmin  = $t[1];
                   if($nextmin > 10):
-                      $nextime = $nexthour .":". $nextmin - 10;
+                      $nextime = $nexthour .":". ($nextmin - 10);
                   else:
                       $nextime = ($nexthour - 1) .":". ($nextmin + 50);    
                   endif;
@@ -535,7 +535,7 @@ function waktuSolatMain($lat, $long, $timezone, $calc){
             $nexthour = $t[0];
             $nextmin  = $t[1];
             if($nextmin > 10):
-              $nowtime = $nexthour .":". $nextmin - 10;
+              $nowtime = $nexthour .":". ($nextmin - 10);
             else:
               $nowtime = ($nexthour - 1) .":". ($nextmin + 50);    
             endif;
