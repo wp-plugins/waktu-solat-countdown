@@ -1,29 +1,28 @@
 #wscontainer {
-	padding: 10px;	
-	width: 100%;
-	min-height: 130px;
+	padding:10px 10px;	
+	width: 95%;
+	min-height: 180px;
 }
 
 .info_message{
 	padding-top:10px;
 	padding-left: 5px;
-	width: 100%;
+	width: 150px;
 	font-size: 8pt;
 	font-weight: bold;
 	text-align: center;
+	margin: 0 auto;
 }
 
 /* -------------- BEGIN COUNTER ---------------------*/
 
 #countbox{
-	padding-top: 20px;
 	color: #fff;
 	font-family: Myriad Pro,Helvetica,sans-serif;
-	font-size: 32px;
-	width: 80%;
-	height: 55px;
-	margin-left:auto;
-	margin-right: auto;
+	width: 118px;
+	height: 35px;
+	margin:0 auto;	
+    padding: 2px 0 15px 0;
 }
 
 #days, #hours, #mins, #secs{
@@ -31,20 +30,21 @@
 	text-align: center;	
 	background-image:url('../images/flip_default.png');
 	background-repeat:no-repeat;
-	margin: -20px 7px 0 7px;
-	height: 44px;
-	width: 47px;
-	z-index:1;
+	margin: 0 auto;
+	height: 33px;
+	width: 35px;
 }
 
 #days_text,#hours_text, #mins_text,#secs_text{
-	position: absolute;
-	height: 20px;
-	width: 47px;
+	float: left;
+	text-align: center;
+	height: 14px;
+	width: 35px;
 	color: #000;
-	font-size: 12px;
+	font-size: 8px;
 	text-transform: uppercase;
-	margin-top: -20px;
+	margin: 0 auto;
+
 }
 	
 #days span, #hours span, #mins span , #secs span {
@@ -52,12 +52,20 @@
 	background-repeat:no-repeat;
 	position: absolute;
 	display: block;
-	height: 28px;
-	width: 47px;
+	height: 21px;
+	width: 35px;
+	margin: 0 auto;
+	z-index: 1;
 }
 
 #days dl, #hours dl, #mins dl , #secs dl {
-	margin-top: 0px;
+	width: 35px;
+	font-size: 24px;
+	line-height: 33px;
+	margin: 0 auto 3px auto;
+	position: absolute;
+	display: block;
+	z-index: 0;
 }
 
 /* -------------- END COUNTER ---------------------*/

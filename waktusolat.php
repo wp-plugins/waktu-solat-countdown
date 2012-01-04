@@ -4,7 +4,7 @@
 Plugin Name: Waktu Solat Countdown
 Plugin URI: http://denaihati.com/projek-waktu-solat
 Description: Prayer Time Plugin with countdown, a collaboration project with <a href="http://denaihati.com/projek-waktu-solat">Denaihati Network</a>.
-Version: 2.0.3
+Version: 2.0.4
 Author: Mohd Hadihaizil Din
 Author URI: http://www.eizil.com
 License: GPL2
@@ -271,7 +271,7 @@ function waktuSolatMethod() {
        else:
             $color = "default";
        endif;     
-       wp_register_style('waktusolat', plugins_url('/style/main_'.$color.'.css', __FILE__), false, '2.0.3'); 
+       wp_register_style('waktusolat', plugins_url('/style/main_'.$color.'.css', __FILE__), false, '2.0.4'); 
        wp_enqueue_style('waktusolat');
 
 }    
@@ -806,9 +806,9 @@ if(date('l', $todayTime) == "Sunday"):
                                 mins=Math.floor(amount/60); /* minutes */
                                 amount=amount%60;
                                 secs=Math.floor(amount); /* seconds */
-                                out=  "<div id='hours'><span></span><dl>" + ('0' + hours).slice(-2) +"</dl><div id='hours_text'><?php echo __('Hour', 'wpwsc'); ?></div></div>" + 
-                                      "<div id='mins'><span></span><dl>" +('0' + mins).slice(-2)  +"</dl><div id='mins_text'><?php echo __('Minute', 'wpwsc'); ?></div></div>" + 
-                                      "<div id='secs'><span></span><dl>" + ('0' + secs).slice(-2) +"</dl><div id='secs_text'><?php echo __('Second', 'wpwsc'); ?></div></div>" ;
+                                out=  "<div id='hours'><dl>" + ('0' + hours).slice(-2) +"</dl><span></span></div><div id='mins'><dl>" +('0' + mins).slice(-2)  +"</dl><span></span></div><div id='secs'><dl>" + ('0' + secs).slice(-2) +"</dl><span></span></div>" + 
+                                      "<div style='clear:both'><div id='hours_text'><?php echo __('Hour', 'wpwsc'); ?></div><div id='mins_text'><?php echo __('Minute', 'wpwsc'); ?></div><div id='secs_text'><?php echo __('Second', 'wpwsc'); ?></div></div>";
+
                                 document.getElementById('countbox').innerHTML=out;
                         }
                       setTimeout(GetCounter, 1000);     }
@@ -912,64 +912,74 @@ $ezwsoptions = array (
                     "id" => $shortname."_custom_css",
                     "type" => "textarea",
                     "std" => "#wscontainer {
-    padding: 10px;  
-    width: 100%;
-    min-height: 130px;
+    background-image:url('".plugins_url('/images/waktu-solat-background.jpg', __FILE__)."');
+    background-repeat:no-repeat;
+    padding:10px 10px;  
+    width: 95%;
+    min-height: 180px;
 }
 
 .info_message{
     padding-top:10px;
     padding-left: 5px;
-    width: 100%;
+    width: 150px;
     font-size: 8pt;
     font-weight: bold;
     text-align: center;
+    margin: 0 auto;
 }
 
 
 #countbox{
-    padding-top: 20px;
     color: #fff;
     font-family: Myriad Pro,Helvetica,sans-serif;
-    font-size: 32px;
-    width: 80%;
-    height: 55px;
-    margin-left:auto;
-    margin-right: auto;
+    width: 118px;
+    height: 35px;
+    margin:0 auto;  
+    padding: 2px 0 15px 0;
 }
 
 #days, #hours, #mins, #secs{
     float: left;
     text-align: center; 
-    background-image:url('../images/flip_default.png');
+    background-image:url('".plugins_url('/images/flip_default.png', __FILE__)."');
     background-repeat:no-repeat;
-    margin: -20px 7px 0 7px;
-    height: 44px;
-    width: 47px;
-    z-index:1;
+    margin: 0 auto;
+    height: 33px;
+    width: 35px;
 }
 
 #days_text,#hours_text, #mins_text,#secs_text{
-    position: absolute;
-    height: 20px;
-    width: 47px;
+    float: left;
+    text-align: center;
+    height: 14px;
+    width: 35px;
     color: #000;
-    font-size: 12px;
+    font-size: 8px;
     text-transform: uppercase;
-    margin-top: -20px;
+    margin: 0 auto;
+
 }
     
 #days span, #hours span, #mins span , #secs span {
-    background: url(../images/flip_gradient_default.png);
+    background: url('".plugins_url('/images/flip_gradient_default.png', __FILE__)."');
     background-repeat:no-repeat;
     position: absolute;
     display: block;
-    height: 28px;
-    width: 47px;
+    height: 21px;
+    width: 35px;
+    margin: 0 auto;
+    z-index: 1;
 }
 
 #days dl, #hours dl, #mins dl , #secs dl {
-    margin-top: 0px;
+    width: 35px;
+    font-size: 24px;
+    line-height: 33px;
+    margin: 0 auto 3px auto;
+    position: absolute;
+    display: block;
+    z-index: 0;
 }
 
 "),   
