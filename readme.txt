@@ -4,7 +4,7 @@ Donate link: http://denaihati.com/projek-waktu-solat
 Tags: prayer time, widget, sidebar, waktu solat, world, world prayer time, prayer time countdown, geolocation
 Requires at least: 3.0
 Tested up to: 3.3.1
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 
 Showing prayer time with countdown
 
@@ -58,6 +58,9 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 
 
 == Upgrade Notice == 
+
+= 2.0.5 =
+* Fix get location bugs.
 
 = 2.0.4 =
 * New styling for counter, fix for other styling bugs
@@ -113,6 +116,9 @@ Bolehkah saya mencadangkan fungsi-fungsi lain untuk plugin ini?
 
 
 == Changelog ==
+
+= 2.0.5 =
+* Fix get location bugs.
 
 = 2.0.4 =
 * New styling for counter, fix for other styling bugs 

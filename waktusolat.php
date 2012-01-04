@@ -4,7 +4,7 @@
 Plugin Name: Waktu Solat Countdown
 Plugin URI: http://denaihati.com/projek-waktu-solat
 Description: Prayer Time Plugin with countdown, a collaboration project with <a href="http://denaihati.com/projek-waktu-solat">Denaihati Network</a>.
-Version: 2.0.4
+Version: 2.0.5
 Author: Mohd Hadihaizil Din
 Author URI: http://www.eizil.com
 License: GPL2
@@ -265,6 +265,7 @@ function waktuSolatMethod() {
        wp_deregister_script( 'jquery' );
        wp_register_script( 'jquery', 'http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js');
        wp_enqueue_script( 'jquery' );
+       wp_enqueue_script('newscript3', plugins_url('/js/jquery.cookies.js', __FILE__), array('jquery'), '1.0', false);
 
        if(get_option('ezws_color_scheme') != ""):
             $color = get_option('ezws_color_scheme');
